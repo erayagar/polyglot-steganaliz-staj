@@ -1,0 +1,24 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Node / frontend tooling (varsa)
+node_modules/
+
+# Proje verileri
+samples/*.mp4
+samples/*.png
+samples/*.jpg
+samples/*.jpeg
+samples/extracted/
+backend/tmp/
+backend/app/media/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
