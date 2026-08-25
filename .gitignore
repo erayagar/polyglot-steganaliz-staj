@@ -8,10 +8,6 @@ __pycache__/
 node_modules/
 
 # Proje verileri
-samples/*.mp4
-samples/*.png
-samples/*.jpg
-samples/*.jpeg
 samples/extracted/
 backend/tmp/
 backend/app/media/
