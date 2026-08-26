@@ -132,10 +132,10 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 8 — Extraction (Unpolyglot) Fonksiyonu
 **Hedef:** Görsel arkasına gizlenmiş MP4 video akışını orijinal görselden ayırıp bağımsız dosya olarak kaydetmek.
 **Alt Görevler:**
-- [ ] `scripts/extract.py` dosyasının oluşturulması
-- [ ] Gün 4'teki `detect_trailer.py` çıktısını (offset bilgisi) kullanarak dosyanın ikiye bölünmesi: temiz görsel kısmı ve video kısmı
-- [ ] Ayıklanan video kısmının `.mp4` uzantısıyla `samples/extracted/` altına kaydedilmesi
-- [ ] Ayıklanan görsel kısmının da (opsiyonel) orijinal görsel olarak doğrulanması
+- [x] `scripts/extract.py` dosyasının oluşturulması
+- [x] Gün 4'teki `detect_trailer.py` çıktısını (offset bilgisi) kullanarak dosyanın ikiye bölünmesi: temiz görsel kısmı ve video kısmı
+- [x] Ayıklanan video kısmının `.mp4` uzantısıyla `samples/extracted/` altına kaydedilmesi
+- [x] Ayıklanan görsel kısmının da (opsiyonel) orijinal görsel olarak doğrulanması
 **Kabul Kriterleri:**
 - Ayıklanan `.mp4` dosyası `ffprobe` ile hatasız açılıyor ve bir video player'da oynatılabiliyor
 - Ayıklama işlemi sonrası orijinal polyglot dosyanın boyutu = ayıklanan görsel boyutu + ayıklanan video boyutu
