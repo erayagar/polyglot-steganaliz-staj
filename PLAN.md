@@ -147,9 +147,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 9 — Ayıklanan Video Meta Verisi Analizi
 **Hedef:** Ayıklanan gizli videonun kare sayısı, süresi, çözünürlüğü ve codec bilgisinin çıkarılması.
 **Alt Görevler:**
-- [ ] `scripts/video_metadata.py`: `ffprobe -print_format json` çıktısını parse eden fonksiyon
-- [ ] OpenCV `cv2.VideoCapture` ile alternatif/yedek bir kare sayısı ve FPS okuma yöntemi
-- [ ] Sonuçların yapılandırılmış (dict/JSON) formatta döndürülmesi
+- [x] `scripts/video_metadata.py`: `ffprobe -print_format json` çıktısını parse eden fonksiyon
+- [x] OpenCV `cv2.VideoCapture` ile alternatif/yedek bir kare sayısı ve FPS okuma yöntemi
+- [x] Sonuçların yapılandırılmış (dict/JSON) formatta döndürülmesi
 **Kabul Kriterleri:**
 - Ayıklanan örnek videolar için kare sayısı, süre (saniye), çözünürlük ve codec adı doğru şekilde raporlanıyor
 **Notlar/Riskler:**
