@@ -160,9 +160,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 10 — Farklı Senaryolarda Tespit Başarımının Ölçülmesi
 **Hedef:** Görsel sıkıştırma ve farklı format kombinasyonlarında sistemin tespit başarımını test etmek.
 **Alt Görevler:**
-- [ ] En az 4 farklı test senaryosu üretilmesi: (1) PNG+MP4 polyglot, (2) JPEG+MP4 polyglot, (3) yeniden sıkıştırılmış/optimize edilmiş polyglot, (4) temiz (video içermeyen) görseller
-- [ ] Her senaryo için pipeline'ın (`detect_trailer` + `entropy` + `size_analysis`) çalıştırılıp sonuçların tablo halinde `docs/test-sonuclari.md` içine yazılması
-- [ ] Yanlış pozitif / yanlış negatif oranlarının not edilmesi
+- [x] En az 4 farklı test senaryosu üretilmesi: (1) PNG+MP4 polyglot, (2) JPEG+MP4 polyglot, (3) yeniden sıkıştırılmış/optimize edilmiş polyglot, (4) temiz (video içermeyen) görseller
+- [x] Her senaryo için pipeline'ın (`detect_trailer` + `entropy` + `size_analysis`) çalıştırılıp sonuçların tablo halinde `docs/test-sonuclari.md` içine yazılması
+- [x] Yanlış pozitif / yanlış negatif oranlarının not edilmesi
 **Kabul Kriterleri:**
 - `docs/test-sonuclari.md` en az 4 senaryo için sonuç satırı içeriyor
 - Sistem temiz dosyalarda %0'a yakın false-positive veriyor

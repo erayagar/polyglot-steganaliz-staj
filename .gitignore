@@ -9,6 +9,7 @@ node_modules/
 
 # Proje verileri
 samples/extracted/
+samples/test_matrix/
 backend/tmp/
 backend/app/media/
 
