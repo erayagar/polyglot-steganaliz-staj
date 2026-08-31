@@ -178,10 +178,10 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 11 — FastAPI Proje İskeleti ve Pydantic Modelleri
 **Hedef:** Backend servisinin temel iskeletini kurmak.
 **Alt Görevler:**
-- [ ] `backend/app/main.py` içinde FastAPI uygulamasının oluşturulması
-- [ ] `backend/app/models.py` içinde Pydantic response modelinin (`AnalyzeResponse`) tanımlanması
-- [ ] `backend/requirements.txt` dosyasının güncellenmesi (fastapi, uvicorn, python-multipart, opencv-python, pillow, numpy)
-- [ ] `uvicorn app.main:app --reload` ile servisin ayağa kalktığının doğrulanması
+- [x] `backend/app/main.py` içinde FastAPI uygulamasının oluşturulması
+- [x] `backend/app/models.py` içinde Pydantic response modelinin (`AnalyzeResponse`) tanımlanması
+- [x] `backend/requirements.txt` dosyasının güncellenmesi (fastapi, uvicorn, python-multipart, opencv-python, pillow, numpy)
+- [x] `uvicorn app.main:app --reload` ile servisin ayağa kalktığının doğrulanması
 **Kabul Kriterleri:**
 - `uvicorn` ile başlatılan servis `http://127.0.0.1:8000` üzerinde `{"status": "ok"}` benzeri bir health-check endpoint'i döndürüyor
 **Notlar/Riskler:**
