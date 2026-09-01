@@ -192,9 +192,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 12 — Dosya Yükleme Endpoint'i
 **Hedef:** Kullanıcının şüpheli görsel yükleyebileceği endpoint'i yazmak.
 **Alt Görevler:**
-- [ ] `POST /api/v1/analyze` endpoint'inin `UploadFile` parametresiyle tanımlanması
-- [ ] Yüklenen dosyanın geçici bir dizine (`backend/tmp/` veya benzeri, `.gitignore`'da) kaydedilmesi
-- [ ] Dosya boyutu ve MIME type doğrulaması (yalnızca PNG/JPEG kabul edilmesi)
+- [x] `POST /api/v1/analyze` endpoint'inin `UploadFile` parametresiyle tanımlanması
+- [x] Yüklenen dosyanın geçici bir dizine (`backend/tmp/` veya benzeri, `.gitignore`'da) kaydedilmesi
+- [x] Dosya boyutu ve MIME type doğrulaması (yalnızca PNG/JPEG kabul edilmesi)
 **Kabul Kriterleri:**
 - Swagger UI (`/docs`) üzerinden bir görsel dosyası yüklenip başarıyla kabul ediliyor
 - Desteklenmeyen bir dosya türü (örn. `.txt`) yüklendiğinde uygun hata dönüyor
