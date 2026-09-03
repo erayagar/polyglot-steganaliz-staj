@@ -1,10 +1,13 @@
 """FastAPI uygulama giriş noktası."""
+import asyncio
 import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from fastapi.staticfiles import StaticFiles
 
-from app.models import HealthResponse, UploadAck
+from app import pipeline
+from app.models import AnalyzeResponse, HealthResponse
 
 app = FastAPI(
     title="Polyglot / Steganaliz Servisi",
@@ -14,6 +17,11 @@ app = FastAPI(
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "tmp"
 MAX_UPLOAD_SIZE = 25 * 1024 * 1024  # 25 MB
+
+# Ayıklanan videolar (bkz. pipeline.run_pipeline) buradan /media/<dosya>
+# yolunda tarayıcıya statik olarak sunulur.
+pipeline.MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=pipeline.MEDIA_DIR), name="media")
 
 # Yalnızca PNG/JPEG kabul edilir; client'ın beyan ettiği Content-Type ile
 # dosyanın gerçek magic bytes'ı çapraz doğrulanır (bkz. docs/format-notlari.md).
@@ -28,8 +36,8 @@ def health_check() -> HealthResponse:
     return HealthResponse(status="ok")
 
 
-@app.post("/api/v1/analyze", response_model=UploadAck, status_code=status.HTTP_201_CREATED)
-async def analyze(file: UploadFile = File(...)) -> UploadAck:
+@app.post("/api/v1/analyze", response_model=AnalyzeResponse, status_code=status.HTTP_201_CREATED)
+async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
     signature = MAGIC_BYTES.get(file.content_type or "")
     if signature is None:
         raise HTTPException(
@@ -57,11 +65,15 @@ async def analyze(file: UploadFile = File(...)) -> UploadAck:
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     extension = ".png" if file.content_type == "image/png" else ".jpg"
     saved_name = f"{uuid.uuid4().hex}{extension}"
-    (UPLOAD_DIR / saved_name).write_bytes(content)
+    saved_path = UPLOAD_DIR / saved_name
+    saved_path.write_bytes(content)
 
-    return UploadAck(
-        filename=file.filename or "unknown",
-        content_type=file.content_type,
-        size_bytes=len(content),
-        saved_as=saved_name,
+    # CPU-yoğun analiz (trailer tarama, entropy, olası extraction) event
+    # loop'u bloklamasın diye ayrı bir thread'de çalıştırılır.
+    result = await asyncio.to_thread(pipeline.run_pipeline, saved_path)
+
+    return AnalyzeResponse(
+        polyglot_status=result["polyglot_status"],
+        extracted_video_url=result["extracted_video_url"],
+        analysis_summary=result["trailer"]["analysis_summary"],
     )

@@ -206,9 +206,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 13 — Pipeline'ın FastAPI'ye Asenkron Entegrasyonu
 **Hedef:** 1-2. haftada yazılan analiz/extraction pipeline'ını API'ye bağlamak.
 **Alt Görevler:**
-- [ ] `scripts/` altındaki modüllerin `backend/app/pipeline.py` içinden import edilebilir hale getirilmesi (gerekirse `scripts/` bir Python paketine dönüştürülür veya `backend/app` içine taşınır)
-- [ ] CPU-yoğun analiz işlemlerinin `asyncio.to_thread` veya `BackgroundTasks` ile event loop'u bloklamadan çalıştırılması
-- [ ] Ayıklanan video dosyalarının `backend/app/media/` altında statik dosya olarak sunulması (`StaticFiles`)
+- [x] `scripts/` altındaki modüllerin `backend/app/pipeline.py` içinden import edilebilir hale getirilmesi (gerekirse `scripts/` bir Python paketine dönüştürülür veya `backend/app` içine taşınır)
+- [x] CPU-yoğun analiz işlemlerinin `asyncio.to_thread` veya `BackgroundTasks` ile event loop'u bloklamadan çalıştırılması
+- [x] Ayıklanan video dosyalarının `backend/app/media/` altında statik dosya olarak sunulması (`StaticFiles`)
 **Kabul Kriterleri:**
 - `/api/v1/analyze` endpoint'i çağrıldığında istek bloklanmadan (event loop donmadan) analiz tamamlanıyor
 - Ayıklanan video `/media/...` yolundan tarayıcıda erişilebiliyor
