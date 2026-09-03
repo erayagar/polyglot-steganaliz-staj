@@ -220,13 +220,13 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 14 — JSON Yanıt Şemasının Tasarlanması
 **Hedef:** API'nin döneceği yanıt yapısını kullanıcının belirttiği alanlarla netleştirmek.
 **Alt Görevler:**
-- [ ] `AnalyzeResponse` Pydantic modeline şu alanların eklenmesi:
+- [x] `AnalyzeResponse` Pydantic modeline şu alanların eklenmesi:
   - `polyglot_status: bool`
   - `threat_score: int` (0-100)
   - `extracted_video_url: str | None`
   - `analysis_summary: str`
-- [ ] `threat_score` hesaplama mantığının tanımlanması (trailer tespiti + entropy farkı + boyut sapması sinyallerinin ağırlıklı birleşimi)
-- [ ] `analysis_summary` metninin dinamik olarak (tespit edilen video boyutu/codec bilgisiyle) oluşturulması
+- [x] `threat_score` hesaplama mantığının tanımlanması (trailer tespiti + entropy farkı + boyut sapması sinyallerinin ağırlıklı birleşimi)
+- [x] `analysis_summary` metninin dinamik olarak (tespit edilen video boyutu/codec bilgisiyle) oluşturulması
 **Kabul Kriterleri:**
 - API yanıtı örnek bir polyglot dosya için `polyglot_status: true`, anlamlı bir `threat_score` ve dolu bir `extracted_video_url` döndürüyor
 - Temiz bir dosya için `polyglot_status: false` ve düşük `threat_score` döndürüyor

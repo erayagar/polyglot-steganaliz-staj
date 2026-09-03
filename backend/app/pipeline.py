@@ -84,3 +84,62 @@ def run_pipeline(saved_path: Path) -> dict:
         "extracted_video_url": extracted_video_url,
         "video_metadata": video_metadata_result,
     }
+
+
+# --- Gün 14: threat_score ve analysis_summary --------------------------
+#
+# Üç sinyal ağırlıklı olarak birleştirilir. Trailer tespiti (Gün 4) en güçlü
+# ve en az yanlış-pozitif üreten sinyal olduğundan en yüksek ağırlığı alır;
+# entropy farkı (Gün 5) ve boyut sapması (Gün 6) tamamlayıcı/destekleyici
+# sinyaller oldukları için (bkz. Gün 6/7 raporlarındaki "tek başına kesin
+# kanıt değil" notu) daha düşük ağırlıklarla katkıda bulunur.
+TRAILER_WEIGHT = 60
+ENTROPY_WEIGHT = 25
+SIZE_WEIGHT = 15
+
+# Bu değere ulaşan/geçen sinyal, o sinyalin ağırlığının tamamını alır
+# (üstü kırpılır); aradaki değerler doğrusal olarak ölçeklenir.
+ENTROPY_DELTA_FULL_SCORE_AT = 3.0  # bit/bayt
+SIZE_DEVIATION_FULL_SCORE_AT = 100.0  # yüzde
+
+
+def compute_threat_score(result: dict) -> int:
+    """Trailer + entropy + boyut sapması sinyallerini 0-100 aralığında tek
+    bir tehdit skoruna ağırlıklı olarak birleştirir."""
+    score = 0.0
+
+    if result["polyglot_status"]:
+        score += TRAILER_WEIGHT
+
+    entropy_delta = result["entropy"]["entropy_delta"]
+    if entropy_delta:
+        score += min(entropy_delta / ENTROPY_DELTA_FULL_SCORE_AT, 1.0) * ENTROPY_WEIGHT
+
+    deviation_percent = result["size"]["deviation_percent"]
+    if deviation_percent and deviation_percent > 0:
+        score += min(deviation_percent / SIZE_DEVIATION_FULL_SCORE_AT, 1.0) * SIZE_WEIGHT
+
+    return max(0, min(100, round(score)))
+
+
+def build_analysis_summary(result: dict, threat_score: int) -> str:
+    """Tespit edilen video boyutu/codec bilgisini de içeren, insan
+    tarafından okunabilir bir özet metni üretir."""
+    if not result["polyglot_status"]:
+        return f"{result['trailer']['analysis_summary']} (threat_score={threat_score})"
+
+    trailer = result["trailer"]
+    summary = (
+        f"Görsele gizlenmiş video tespit edildi: '{trailer['detected_signature']}' "
+        f"imzası offset {trailer['hidden_video_offset']} konumunda bulundu "
+        f"(threat_score={threat_score})."
+    )
+
+    video_meta = result["video_metadata"]
+    if video_meta:
+        summary += (
+            f" Ayıklanan video: {video_meta['width']}x{video_meta['height']}, "
+            f"{video_meta['duration_seconds']} sn, codec={video_meta['codec']}."
+        )
+
+    return summary

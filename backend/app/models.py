@@ -9,12 +9,12 @@ class HealthResponse(BaseModel):
 class AnalyzeResponse(BaseModel):
     """`/api/v1/analyze` yanıt şeması.
 
-    Gün 13'te pipeline'a bağlandı (`polyglot_status`, `extracted_video_url`
-    doluyor); `threat_score` ağırlıklı hesabı ve dinamik `analysis_summary`
-    metni Gün 14'te işlenecek, bu yüzden ikisi de şimdilik opsiyonel.
+    `threat_score` (0-100), trailer tespiti + entropy farkı + boyut sapması
+    sinyallerinin ağırlıklı birleşimiyle `pipeline.compute_threat_score`
+    tarafından hesaplanır (bkz. docs/gun14-json-yanit-semasi-raporu.md).
     """
 
     polyglot_status: bool
-    threat_score: int | None = None
+    threat_score: int
     extracted_video_url: str | None = None
-    analysis_summary: str | None = None
+    analysis_summary: str

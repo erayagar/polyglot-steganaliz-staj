@@ -71,9 +71,11 @@ async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
     # CPU-yoğun analiz (trailer tarama, entropy, olası extraction) event
     # loop'u bloklamasın diye ayrı bir thread'de çalıştırılır.
     result = await asyncio.to_thread(pipeline.run_pipeline, saved_path)
+    threat_score = pipeline.compute_threat_score(result)
 
     return AnalyzeResponse(
         polyglot_status=result["polyglot_status"],
+        threat_score=threat_score,
         extracted_video_url=result["extracted_video_url"],
-        analysis_summary=result["trailer"]["analysis_summary"],
+        analysis_summary=pipeline.build_analysis_summary(result, threat_score),
     )
