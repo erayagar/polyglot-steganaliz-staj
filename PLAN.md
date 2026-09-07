@@ -238,9 +238,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 15 — Swagger Testleri ve Hata Yönetimi
 **Hedef:** API'nin uçtan uca test edilmesi ve hata senaryolarının ele alınması.
 **Alt Görevler:**
-- [ ] Swagger UI (`/docs`) üzerinden en az 3 farklı dosya ile manuel test yapılması
-- [ ] Bozuk/geçersiz dosya, çok büyük dosya, desteklenmeyen format için `HTTPException` ile anlamlı hata mesajları döndürülmesi
-- [ ] Global exception handler (`@app.exception_handler`) ile beklenmeyen hataların yakalanması
+- [x] Swagger UI (`/docs`) üzerinden en az 3 farklı dosya ile manuel test yapılması
+- [x] Bozuk/geçersiz dosya, çok büyük dosya, desteklenmeyen format için `HTTPException` ile anlamlı hata mesajları döndürülmesi
+- [x] Global exception handler (`@app.exception_handler`) ile beklenmeyen hataların yakalanması
 **Kabul Kriterleri:**
 - Tüm hata senaryolarında API 500 yerine anlamlı HTTP durum kodları (400, 413, 422 vb.) ve JSON hata mesajı döndürüyor
 **Notlar/Riskler:**

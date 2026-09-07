@@ -1,13 +1,17 @@
 """FastAPI uygulama giriş noktası."""
 import asyncio
+import logging
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile, status
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app import pipeline
 from app.models import AnalyzeResponse, HealthResponse
+
+logger = logging.getLogger("app")
 
 app = FastAPI(
     title="Polyglot / Steganaliz Servisi",
@@ -31,6 +35,17 @@ MAGIC_BYTES: dict[str, bytes] = {
 }
 
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Beklenmeyen (öngörülmemiş) hataları 500 yerine anlamlı, stack-trace
+    sızdırmayan bir JSON gövdesiyle döndürür."""
+    logger.exception("Beklenmeyen hata: %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Sunucuda beklenmeyen bir hata oluştu."},
+    )
+
+
 @app.get("/", response_model=HealthResponse)
 def health_check() -> HealthResponse:
     return HealthResponse(status="ok")
@@ -49,6 +64,12 @@ async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
         )
 
     content = await file.read()
+
+    if len(content) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Yüklenen dosya boş (0 bayt).",
+        )
 
     if len(content) > MAX_UPLOAD_SIZE:
         raise HTTPException(
@@ -70,7 +91,16 @@ async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
 
     # CPU-yoğun analiz (trailer tarama, entropy, olası extraction) event
     # loop'u bloklamasın diye ayrı bir thread'de çalıştırılır.
-    result = await asyncio.to_thread(pipeline.run_pipeline, saved_path)
+    try:
+        result = await asyncio.to_thread(pipeline.run_pipeline, saved_path)
+    except ValueError as exc:
+        # scripts/ altındaki tüm analiz modülleri bozuk/geçersiz dosya
+        # yapısında ValueError fırlatır (bkz. detect_trailer.py, size_analysis.py).
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Dosya işlenemedi (bozuk veya geçersiz içerik): {exc}",
+        ) from exc
+
     threat_score = pipeline.compute_threat_score(result)
 
     return AnalyzeResponse(
