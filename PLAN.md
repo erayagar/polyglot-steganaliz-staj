@@ -255,9 +255,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 16 — Sürükle-Bırak Yükleme Arayüzü
 **Hedef:** Kullanıcının şüpheli dosyayı yükleyebileceği basit bir web arayüzü tasarlamak.
 **Alt Görevler:**
-- [ ] `frontend/index.html`, `frontend/style.css`, `frontend/app.js` dosyalarının oluşturulması
-- [ ] Sürükle-bırak (drag & drop) dosya yükleme alanının HTML5/JS ile implementasyonu
-- [ ] Yükleme sırasında basit bir yükleniyor (loading) göstergesi
+- [x] `frontend/index.html`, `frontend/style.css`, `frontend/app.js` dosyalarının oluşturulması
+- [x] Sürükle-bırak (drag & drop) dosya yükleme alanının HTML5/JS ile implementasyonu
+- [x] Yükleme sırasında basit bir yükleniyor (loading) göstergesi
 **Kabul Kriterleri:**
 - Arayüz tarayıcıda açılıp bir dosya sürükle-bırak ile seçilebiliyor
 **Notlar/Riskler:**

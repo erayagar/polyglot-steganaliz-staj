@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polyglot / Steganaliz Servisi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="page__header">
+      <h1>Polyglot / Steganaliz Servisi</h1>
+      <p class="subtitle">
+        Bir görsel (PNG/JPEG) yükleyin; dosyanın arkasına gizlenmiş video/veri
+        (polyglot) olup olmadığını analiz edelim.
+      </p>
+    </header>
+
+    <main>
+      <section
+        id="dropzone"
+        class="dropzone"
+        tabindex="0"
+        role="button"
+        aria-label="Dosya yüklemek için tıklayın veya sürükleyip bırakın"
+      >
+        <input
+          type="file"
+          id="file-input"
+          class="visually-hidden"
+          accept="image/png,image/jpeg"
+        />
+        <div class="dropzone__content">
+          <svg
+            class="dropzone__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 16V4m0 0L7 9m5-5l5 5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <p class="dropzone__text">
+            <strong>Dosyayı buraya sürükleyin</strong> ya da seçmek için
+            tıklayın
+          </p>
+          <p class="dropzone__hint">Yalnızca PNG veya JPEG, en fazla 25 MB</p>
+        </div>
+      </section>
+
+      <p id="error-message" class="error-message" hidden></p>
+
+      <section id="file-preview" class="file-preview" hidden>
+        <img id="file-thumbnail" class="file-preview__thumbnail" alt="" />
+        <div class="file-preview__meta">
+          <span id="file-name" class="file-preview__name"></span>
+          <span id="file-size" class="file-preview__size"></span>
+        </div>
+        <button id="remove-file" type="button" class="file-preview__remove" aria-label="Dosyayı kaldır">
+          &times;
+        </button>
+      </section>
+
+      <div id="loading" class="loading" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <span>Analiz ediliyor&hellip;</span>
+      </div>
+
+      <section id="results" class="results" hidden></section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
