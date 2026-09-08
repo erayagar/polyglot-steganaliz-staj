@@ -5,6 +5,7 @@ import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -17,6 +18,16 @@ app = FastAPI(
     title="Polyglot / Steganaliz Servisi",
     description="Görsel dosyaların arkasına gizlenmiş video/veri (polyglot) tespiti API'si.",
     version="0.1.0",
+)
+
+# frontend/ backend'den farklı bir origin'den (file://, python -m http.server
+# vb.) açılabildiği ve servis kimlik doğrulama/cookie kullanmadığı için tüm
+# origin'lere izin verilmesi (yalnızca geliştirme ortamı için) yeterlidir.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "tmp"

@@ -268,11 +268,11 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 17 — Frontend-Backend Entegrasyonu ve Sonuç Gösterimi
 **Hedef:** Analiz sonuçlarının ve ayıklanan videonun arayüzde gösterilmesi.
 **Alt Görevler:**
-- [ ] `app.js` içinde `fetch` ile `/api/v1/analyze` endpoint'ine dosya gönderilmesi
-- [ ] `threat_score`in görsel bir gösterge (renkli bar/rozet) ile gösterilmesi
-- [ ] `analysis_summary` metninin ekranda gösterilmesi
-- [ ] `extracted_video_url` doluysa HTML5 `<video>` player ile videonun oynatılması
-- [ ] CORS ayarlarının FastAPI tarafında (`CORSMiddleware`) yapılandırılması
+- [x] `app.js` içinde `fetch` ile `/api/v1/analyze` endpoint'ine dosya gönderilmesi
+- [x] `threat_score`in görsel bir gösterge (renkli bar/rozet) ile gösterilmesi
+- [x] `analysis_summary` metninin ekranda gösterilmesi
+- [x] `extracted_video_url` doluysa HTML5 `<video>` player ile videonun oynatılması
+- [x] CORS ayarlarının FastAPI tarafında (`CORSMiddleware`) yapılandırılması
 **Kabul Kriterleri:**
 - Bir polyglot dosya yüklendiğinde risk skoru, özet ve gömülü video player tarayıcıda görüntüleniyor
 **Notlar/Riskler:**

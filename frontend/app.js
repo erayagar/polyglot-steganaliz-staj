@@ -3,6 +3,10 @@
 
   const ACCEPTED_TYPES = new Set(["image/png", "image/jpeg"]);
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB, backend ile aynı sınır
+  const API_BASE_URL = "http://127.0.0.1:8000";
+
+  const THREAT_LOW_MAX = 33; // 0-33: düşük (yeşil)
+  const THREAT_MEDIUM_MAX = 66; // 34-66: orta (sarı), 67-100: yüksek (kırmızı)
 
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("file-input");
@@ -17,6 +21,7 @@
 
   let selectedFile = null;
   let thumbnailUrl = null;
+  let activeAnalysisController = null;
 
   function formatFileSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
@@ -50,6 +55,10 @@
   }
 
   function resetSelection() {
+    if (activeAnalysisController) {
+      activeAnalysisController.abort();
+      activeAnalysisController = null;
+    }
     selectedFile = null;
     if (thumbnailUrl) {
       URL.revokeObjectURL(thumbnailUrl);
@@ -60,6 +69,100 @@
     fileThumbnail.src = "";
     clearResults();
     setLoading(false);
+  }
+
+  function threatLevelClass(score) {
+    if (score <= THREAT_LOW_MAX) return "threat--low";
+    if (score <= THREAT_MEDIUM_MAX) return "threat--medium";
+    return "threat--high";
+  }
+
+  function renderResults(data) {
+    resultsSection.innerHTML = "";
+
+    const badge = document.createElement("div");
+    badge.className = `result-badge ${data.polyglot_status ? "result-badge--danger" : "result-badge--success"}`;
+    badge.textContent = data.polyglot_status ? "Polyglot tespit edildi" : "Temiz dosya";
+    resultsSection.appendChild(badge);
+
+    const levelClass = threatLevelClass(data.threat_score);
+
+    const scoreRow = document.createElement("div");
+    scoreRow.className = "threat-score";
+    scoreRow.innerHTML = `<span>Tehdit skoru</span><span class="threat-score__value ${levelClass}">${data.threat_score}/100</span>`;
+    resultsSection.appendChild(scoreRow);
+
+    const bar = document.createElement("div");
+    bar.className = "threat-bar";
+    const fill = document.createElement("div");
+    fill.className = `threat-bar__fill ${levelClass}`;
+    fill.style.width = `${data.threat_score}%`;
+    bar.appendChild(fill);
+    resultsSection.appendChild(bar);
+
+    const summary = document.createElement("p");
+    summary.className = "result-summary";
+    summary.textContent = data.analysis_summary;
+    resultsSection.appendChild(summary);
+
+    if (data.extracted_video_url) {
+      const videoWrapper = document.createElement("div");
+      videoWrapper.className = "result-video";
+      const video = document.createElement("video");
+      video.controls = true;
+      video.src = `${API_BASE_URL}${data.extracted_video_url}`;
+      videoWrapper.appendChild(video);
+      resultsSection.appendChild(videoWrapper);
+    }
+
+    resultsSection.hidden = false;
+  }
+
+  async function analyzeFile(file) {
+    if (activeAnalysisController) {
+      activeAnalysisController.abort();
+    }
+    const controller = new AbortController();
+    activeAnalysisController = controller;
+
+    clearError();
+    clearResults();
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        let detail = `Analiz başarısız oldu (HTTP ${response.status}).`;
+        try {
+          const errorBody = await response.json();
+          if (errorBody && errorBody.detail) {
+            detail = errorBody.detail;
+          }
+        } catch {
+          // Yanıt gövdesi JSON değilse varsayılan mesaj kullanılır.
+        }
+        throw new Error(detail);
+      }
+
+      const data = await response.json();
+      renderResults(data);
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      showError(error.message || "Sunucuya bağlanılamadı.");
+    } finally {
+      if (activeAnalysisController === controller) {
+        setLoading(false);
+        activeAnalysisController = null;
+      }
+    }
   }
 
   function validateFile(file) {
@@ -100,8 +203,7 @@
 
     selectedFile = file;
     showFilePreview(file);
-    // NOT: /api/v1/analyze entegrasyonu (fetch + loading göstergesinin
-    // gerçek istekle birlikte kullanılması) Gün 17 kapsamındadır.
+    analyzeFile(file);
   }
 
   dropzone.addEventListener("click", () => fileInput.click());
