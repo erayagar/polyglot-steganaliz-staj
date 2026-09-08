@@ -8,14 +8,14 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 
 ## Durum
 
-**Gün 14 / 20 tamamlandı** (Hafta 1-2: dosya format analizi + steganaliz motoru ✅, Hafta 3: FastAPI servisi 🔶 devam ediyor). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına bakın.
+**Gün 17 / 20 tamamlandı** (Hafta 1-3 ✅ tamamlandı, Hafta 4: web dashboard + test & raporlama 🔶 devam ediyor). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına bakın.
 
 | Bileşen | Durum |
 |---|---|
 | Format analizi ve polyglot üretici (`scripts/`) | ✅ Hazır |
 | Steganaliz motoru (trailer, entropy, boyut sapması, LSB/DCT, extraction) | ✅ Hazır |
-| FastAPI backend (`backend/`) | 🔶 Çalışıyor, hata yönetimi (Gün 15) devam ediyor |
-| Web arayüzü (`frontend/`) | ⬜ Henüz başlamadı (Gün 16-17) |
+| FastAPI backend (`backend/`, CORS dahil) | ✅ Hazır |
+| Web arayüzü (`frontend/`, backend'e canlı bağlı) | ✅ Hazır, uçtan uca doğrulama (Gün 18) devam ediyor |
 
 ## Nasıl Çalışır
 
@@ -26,7 +26,7 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 ## Teknoloji Yığını
 - **Backend:** Python 3.11+, FastAPI, Pydantic, Uvicorn
 - **Görüntü/Video İşleme:** OpenCV, Pillow, NumPy, ffmpeg/ffprobe
-- **Frontend:** HTML5 / CSS3 / Vanilla JS (Gün 16-17'de eklenecek)
+- **Frontend:** HTML5 / CSS3 / Vanilla JS (sürükle-bırak yükleme, backend'e canlı `fetch` entegrasyonu)
 - **Analiz:** Shannon entropy, LSB/DCT gürültü analizi, dosya trailer (EOF ötesi) taraması, teorik/gerçek boyut sapma analizi
 
 ## Proje Yapısı
@@ -39,7 +39,7 @@ polyglot-steganaliz-staj/
 │   │   ├── pipeline.py  # scripts/ analiz modüllerini API'ye bağlayan katman
 │   │   └── models.py    # Pydantic yanıt modelleri (AnalyzeResponse, HealthResponse)
 │   └── requirements.txt
-├── frontend/             # Web dashboard (henüz boş, Gün 16-17)
+├── frontend/             # Web dashboard (sürükle-bırak yükleme, sonuç/video gösterimi)
 ├── scripts/              # Bağımsız çalıştırılabilir CLI analiz/üretim script'leri
 ├── samples/              # Sentetik test dosyaları (git'e dahil değil)
 └── docs/                 # Format notları, test sonuçları, günlük raporlar (.md + .pdf)
@@ -73,6 +73,22 @@ uvicorn app.main:app --reload
 ```
 
 Servis `http://127.0.0.1:8000` üzerinde ayağa kalkar. İnteraktif dokümantasyon için `http://127.0.0.1:8000/docs` (Swagger UI).
+
+### Web arayüzünü çalıştırma
+
+Backend ayaktayken, `frontend/index.html` doğrudan tarayıcıda açılabilir
+(`file://` ile) veya ayrı bir origin'den statik olarak sunulabilir:
+
+```bash
+cd frontend
+python3 -m http.server 5500
+```
+
+Ardından `http://127.0.0.1:5500` adresi tarayıcıda açılır. Bir PNG/JPEG
+sürükleyip bırakınca (veya tıklayıp seçince) dosya otomatik olarak backend'e
+gönderilir; tehdit skoru, analiz özeti ve (varsa) ayıklanan videonun
+oynatıcısı ekranda gösterilir. Backend `CORSMiddleware` ile farklı origin'den
+gelen isteklere izin verecek şekilde yapılandırılmıştır.
 
 ### Bir dosyayı analiz etme
 
