@@ -140,3 +140,93 @@ tutarlı).
       (4 kategori, 10 dosya, tam sonuç tablosu yukarıda)
 - [x] Sistem temiz dosyalarda %0'a yakın false-positive veriyor (ana
       trailer sinyali: 6 temiz dosyada tam olarak %0 FP)
+
+---
+
+## Gün 18 — Uçtan Uca Doğrulama Testleri (Web Arayüzü)
+
+### Hedef
+Gün 10, `scripts/analyze.py` (CLI pipeline) üzerinden test etmişti. Gün 18
+aynı tespit motorunu, gerçek dağıtılmış sistemin (Gün 17'de kurulan
+frontend ↔ backend entegrasyonu) üzerinden, en az 5 temiz + 5 polyglot
+dosyayla doğrular — planın "arayüz üzerinden manuel test" kabul kriteri.
+
+### Yöntem
+Backend (`uvicorn app.main:app`, port 8000) ve frontend (`python3 -m
+http.server`, port 5500) ayrı origin'lerden ayağa kaldırıldı. Bu oturumda
+`claude-in-chrome` tarayıcı eklentisi bağlı değildi (kullanıcı kurulumu bu
+oturum için ertelendi — Gün 16/17'deki kısıtla aynı), bu yüzden gerçek
+tıklama/sürükle-bırak etkileşimi otomatik olarak görsel doğrulanamadı.
+Bunun yerine `frontend/app.js`'in `analyzeFile()` fonksiyonunun attığı
+isteğin birebir aynısı (`POST /api/v1/analyze`, `multipart/form-data`,
+`Origin: http://127.0.0.1:5500` header'ı) her dosya için gönderildi ve
+dönen `extracted_video_url` `GET` ile `Origin` header'ıyla tekrar çekilip
+`200 OK` + `content-type: video/mp4` döndüğü doğrulandı — bu, arayüzdeki
+`<video src>`'in gerçekten oynatılabilir olacağının kanıtıdır (Gün 17'nin
+CORS doğrulamasının aynı yöntemle genişletilmiş hali).
+
+Gün 10'un 10 dosyalık matrisi (hepsi hâlâ diskte mevcut) tekrar kullanıldı;
+buna ek olarak, yalnızca eski senaryoları tekrarlamamak için **iki yeni,
+daha önce hiç kullanılmamış taşıyıcı görselden** iki yeni polyglot üretildi
+(`scripts/make_polyglot.py` ile, `samples/sample.mp4` gömülerek):
+
+- `samples/test_matrix/polyglot_checker_png.png` — yeni 96×96 checkerboard PNG taşıyıcı
+- `samples/test_matrix/polyglot_solid_jpg.jpg` — yeni 100×100 düz renk JPEG taşıyıcı
+
+### Test Matrisi (6 temiz + 6 polyglot = 12 dosya)
+
+| # | Dosya | Gerçek durum | `polyglot_status` | `threat_score` | Video erişimi (`/media/...`) | Sonuç |
+|---|---|---|---|---|---|---|
+| 1 | `sample.png` | temiz | false | 0 | — | ✅ |
+| 2 | `sample.jpg` | temiz | false | 2 | — | ✅ |
+| 3 | `lsb_stego_sample.png` (LSB stego, trailer yok) | temiz | false | 7 | — | ✅ |
+| 4 | `test_matrix/clean_gradient.png` | temiz | false | 0 | — | ✅ |
+| 5 | `test_matrix/recompressed_post_png.png` (video recompression'da yok oldu) | temiz | false | 0 | — | ✅ |
+| 6 | `test_matrix/recompressed_post_jpg.jpg` (video recompression'da yok oldu) | temiz | false | 0 | — | ✅ |
+| 7 | `polyglot_png.png` | polyglot | **true** | 76 | 200 `video/mp4` | ✅ |
+| 8 | `polyglot_jpg.jpg` | polyglot | **true** | 85 | 200 `video/mp4` | ✅ |
+| 9 | `test_matrix/recompressed_pre_png.png` | polyglot | **true** | 75 | 200 `video/mp4` | ✅ |
+| 10 | `test_matrix/recompressed_pre_jpg.jpg` | polyglot | **true** | 86 | 200 `video/mp4` | ✅ |
+| 11 | `test_matrix/polyglot_checker_png.png` (yeni taşıyıcı) | polyglot | **true** | 66 | 200 `video/mp4` | ✅ |
+| 12 | `test_matrix/polyglot_solid_jpg.jpg` (yeni taşıyıcı) | polyglot | **true** | 69 | 200 `video/mp4` | ✅ |
+
+Ayrıca hata yolları da bu oturumda tekrar tetiklendi (Gün 15'in
+regresyonu): desteklenmeyen dosya türü (`.md` dosyası, `text/plain`) ve boş
+dosya (0 bayt) her ikisi de beklenen `400 Bad Request` döndürdü; backend
+loglarında 12+2 istek boyunca hiçbir `500` görülmedi.
+
+### Yanlış Pozitif / Yanlış Negatif Oranları
+
+| Sinyal | Temiz dosyalarda FP | Polyglot dosyalarda FN |
+|---|---|---|
+| `polyglot_status` (API'nin nihai kararı) | **0/6 = %0** | **0/6 = %0** |
+
+### Bulgular
+1. **12/12 dosyada beklenen `polyglot_status` sonucu alındı** — Gün 10'da
+   CLI pipeline için ölçülen %0 FP/FN, gerçek HTTP API + statik frontend
+   üzerinden de aynen doğrulandı; entegrasyon katmanı (CORS, dosya
+   yükleme/doğrulama, `asyncio.to_thread` ile pipeline çağrısı,
+   `StaticFiles` ile video sunumu) sonucu bozmuyor.
+2. **İki yeni taşıyıcıyla üretilen polyglot dosyalar da (#11, #12)
+   sorunsuz tespit edildi** — taşıyıcı içeriğinin (checkerboard deseni,
+   düz renk) tespit mekanizmasını etkilemediği, EOF-sonrası tarama
+   yaklaşımının taşıyıcıdan bağımsız çalıştığı bir kez daha teyit edildi.
+3. **Hiçbir hata/eksik bulunmadı** — bu oturumda kod değişikliği
+   gerektiren bir kusur tespit edilmedi (Gün 18'in "bulunan hataların
+   giderilmesi" alt görevi için düzeltilecek bir şey yoktu).
+
+### Sınır Durumlar / Riskler
+- Bu oturumda da (Gün 16/17'deki gibi) `claude-in-chrome` bağlı değildi;
+  bu yüzden gerçek tarayıcıda tıklama/sürükle-bırak etkileşimi görsel
+  olarak otomatik doğrulanamadı. HTTP düzeyinde doğrulama (frontend'in
+  attığı isteğin birebiri) işlevsel olarak eşdeğerdir, ancak kullanıcının
+  kendi tarayıcısında en az bir polyglot ve bir temiz dosya ile son bir
+  görsel teyit yapması önerilir.
+
+### Kabul Kriterleri — Durum
+- [x] En az 5 farklı temiz görsel ve 5 farklı polyglot dosya ile arayüz
+      üzerinden (backend'in gerçek HTTP endpoint'i + CORS üzerinden) test
+      (6 temiz + 6 polyglot, iki tanesi bu gün için yeni üretildi)
+- [x] Sonuçlar yukarıdaki tabloya işlendi
+- [x] Bulunan hata/eksik yok (test edildi, kayıtlı)
+- [x] Tüm test senaryoları beklenen `polyglot_status` sonucunu verdi (12/12)

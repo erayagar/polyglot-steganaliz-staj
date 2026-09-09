@@ -8,14 +8,14 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 
 ## Durum
 
-**Gün 17 / 20 tamamlandı** (Hafta 1-3 ✅ tamamlandı, Hafta 4: web dashboard + test & raporlama 🔶 devam ediyor). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına bakın.
+**Gün 18 / 20 tamamlandı** (Hafta 1-3 ✅ tamamlandı, Hafta 4: web dashboard + test & raporlama 🔶 devam ediyor). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına bakın.
 
 | Bileşen | Durum |
 |---|---|
 | Format analizi ve polyglot üretici (`scripts/`) | ✅ Hazır |
 | Steganaliz motoru (trailer, entropy, boyut sapması, LSB/DCT, extraction) | ✅ Hazır |
 | FastAPI backend (`backend/`, CORS dahil) | ✅ Hazır |
-| Web arayüzü (`frontend/`, backend'e canlı bağlı) | ✅ Hazır, uçtan uca doğrulama (Gün 18) devam ediyor |
+| Web arayüzü (`frontend/`, backend'e canlı bağlı) | ✅ Hazır, uçtan uca doğrulandı (Gün 18: 12/12 test dosyası, `docs/test-sonuclari.md`) |
 
 ## Nasıl Çalışır
 

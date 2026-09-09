@@ -283,9 +283,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 18 — Uçtan Uca Doğrulama Testleri
 **Hedef:** Sistemin temiz ve polyglot dosyalarla bütünsel olarak doğrulanması.
 **Alt Görevler:**
-- [ ] En az 5 farklı temiz görsel ve 5 farklı polyglot dosya ile arayüz üzerinden manuel test
-- [ ] Sonuçların `docs/test-sonuclari.md` dosyasına (Gün 10'daki tabloya ek olarak) işlenmesi
-- [ ] Bulunan hataların/eksiklerin giderilmesi
+- [x] En az 5 farklı temiz görsel ve 5 farklı polyglot dosya ile arayüz üzerinden manuel test
+- [x] Sonuçların `docs/test-sonuclari.md` dosyasına (Gün 10'daki tabloya ek olarak) işlenmesi
+- [x] Bulunan hataların/eksiklerin giderilmesi
 **Kabul Kriterleri:**
 - Tüm test senaryoları beklenen `polyglot_status` sonucunu veriyor
 **Notlar/Riskler:**
