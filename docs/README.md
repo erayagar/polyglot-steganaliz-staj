@@ -39,7 +39,7 @@ sunulabilir kopyasıdır (Gün 1 ve Gün 2 yalnızca `.pdf` olarak mevcut).
 | 16 | Sürükle-bırak arayüzü | [gun16-surukle-birak-arayuz-raporu.md](./gun16-surukle-birak-arayuz-raporu.md) |
 | 17 | Frontend-backend entegrasyonu | [gun17-frontend-backend-entegrasyonu-raporu.md](./gun17-frontend-backend-entegrasyonu-raporu.md) |
 | 18 | Uçtan uca doğrulama testleri | [gun18-uctan-uca-dogrulama-raporu.md](./gun18-uctan-uca-dogrulama-raporu.md) |
-| 19 | Dokümantasyon ve depo düzenleme | [gun19-dokumantasyon-repo-raporu.md](./gun19-dokumantasyon-repo-raporu.md) |
+| 19 | Dokümantasyon ve depo düzenleme | [gun19-dokumantasyon-repo-raporu.md](./gun19-dokumantasyon-repo-raporu.md) / [.pdf](./gun19-dokumantasyon-repo-raporu.pdf) |
 
 ## Haftalık Özet Raporlar
 - [`hafta1-raporu.md`](./hafta1-raporu.md) — Hafta 1 (Gün 1-5): dosya
