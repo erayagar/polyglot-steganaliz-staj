@@ -46,6 +46,8 @@ sunulabilir kopyasıdır (Gün 1 ve Gün 2 yalnızca `.pdf` olarak mevcut).
   format mimarisi, polyglot üretimi, trailer/entropy analizi.
 - [`hafta2-raporu.md`](./hafta2-raporu.md) — Hafta 2 (Gün 6-10):
   steganaliz motoru, extraction, video meta verisi, senaryo testleri.
+- [`hafta3-raporu.md`](./hafta3-raporu.md) — Hafta 3 (Gün 11-15): FastAPI
+  REST servisi, pipeline entegrasyonu, `threat_score` şeması, hata yönetimi.
 
 ## Üretilmiş Analiz Görselleri
 Günlük raporların içinden göreli dosya adıyla (`![...](dosya.png)`)
