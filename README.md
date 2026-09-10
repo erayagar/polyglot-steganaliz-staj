@@ -168,5 +168,13 @@ Her script'in kendi `--help` çıktısı ve `docs/gunN-*.md` raporlarında ayrı
 - [`docs/test-sonuclari.md`](./docs/test-sonuclari.md) — farklı senaryolarda tespit başarımı
 - `docs/gunN-*.md` / `.pdf` — her günün hedefi, yaklaşımı, test sonuçları ve notları
 
+## Günlerin Ardından Geliştirmeler (Opsiyonel)
+
+20 günlük planın parçası değildir. Proje işlevsel olarak tamamlandıktan
+sonra, kapsamı genişletmeden eklenebilecek kalite/sunum iyileştirmeleri
+[`PLAN.md`](./PLAN.md#günlerin-ardından-geliştirmeler-opsiyonel) içinde
+ayrı bir başlık altında listelenmiştir (ör. otomatik `pytest` test paketi,
+arayüz ekran görüntüsü, görsel mimari diyagramı). Hiçbiri zorunlu değildir.
+
 ## Lisans / Etik Not
 Bu proje yalnızca eğitim ve savunma amaçlı geliştirilmiştir. Herhangi bir platformdan izinsiz veri kazıma (scraping) veya gerçek kullanıcı verisiyle test yapılmaz; tüm örnek dosyalar sentetik olarak üretilir.

@@ -326,3 +326,33 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ## Genel Notlar
 - Bu plan bir yol haritasıdır; günler arasında geçiş ihtiyaca göre esnetilebilir (örn. bir gün erken biterse bir sonraki güne geçilebilir).
 - Proje kapsamı yalnızca savunma/eğitim amaçlıdır; gerçek X (Twitter) API'sinden veri çekme veya scraping bu projenin bir parçası değildir — tüm test dosyaları sentetik olarak üretilir.
+
+---
+
+## Günlerin Ardından Geliştirmeler (Opsiyonel)
+
+20 günlük planın parçası değildir; proje tamamlandıktan sonra, kapsamı
+fazla genişletmeden eklenebilecek, kalite/sunum değeri yüksek ek
+geliştirme fikirleri burada not edilmiştir. Hiçbiri zorunlu değildir —
+istenirse ileride tek tek ele alınabilir.
+
+- [ ] **Otomatik test paketi (`pytest`)** — şu ana kadar tüm testler
+  manuel (Gün 10, Gün 18); `detect_trailer.analyze`, `size_analysis.analyze`,
+  `extract.extract`, `pipeline.compute_threat_score` gibi saf fonksiyonlar
+  ve FastAPI `TestClient` ile endpoint doğrulamaları (`/api/v1/analyze`
+  magic-bytes reddi, hata kodları) için `tests/` klasörü altında ~15-20
+  testlik bir paket.
+- [ ] **README'ye ekran görüntüsü/kısa GIF** — arayüzün gerçek bir analiz
+  sonucunu (risk skoru + video player) gösteren bir görsel.
+- [ ] **Mimari diyagramının görselleştirilmesi** — README'deki ASCII
+  kutu-çizgi "İstek Akışı" diyagramının yerine/yanına gerçek bir görsel
+  diyagram eklenmesi.
+- [ ] **Frontend'de küçük UI cilası** — sonuç kartında görsel hiyerarşi/
+  geçiş animasyonu iyileştirmeleri (işlevsellik değişmeden).
+- [ ] **`LICENSE` dosyasının eklenmesi**
+
+**Notlar:** Bu liste "istenilenlerin dışına çıkmadan" ilkesini korumak
+için kasıtlı olarak küçük ve mevcut mimariyle uyumlu tutuldu; yeni bir
+üçüncü parti servis, gerçek veri toplama veya projenin kapsamını
+(defensive/eğitim amaçlı steganaliz) değiştirecek bir öneri buraya
+eklenmemiştir.
