@@ -59,11 +59,15 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 @app.get("/", response_model=HealthResponse)
 def health_check() -> HealthResponse:
+    """Servisin ayakta olduğunu doğrulayan basit health-check endpoint'i."""
     return HealthResponse(status="ok")
 
 
 @app.post("/api/v1/analyze", response_model=AnalyzeResponse, status_code=status.HTTP_201_CREATED)
 async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
+    """Yüklenen PNG/JPEG dosyasını doğrulayıp (magic bytes + boyut), tam
+    steganaliz pipeline'ından (`pipeline.run_pipeline`) geçirir ve
+    polyglot durumu, tehdit skoru ve varsa ayıklanan video URL'ini döner."""
     signature = MAGIC_BYTES.get(file.content_type or "")
     if signature is None:
         raise HTTPException(

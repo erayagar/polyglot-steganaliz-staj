@@ -121,6 +121,10 @@ def _probe_opencv(path: Path) -> Optional[dict]:
 
 
 def get_metadata(path: Path) -> dict:
+    """Video meta verisini önce `ffprobe`, bulunamaz/başarısız olursa
+    OpenCV `cv2.VideoCapture` ile okur; ikisi de başarısızsa `ValueError`
+    fırlatır. `pipeline.py` bu fonksiyonu modülün ana giriş noktası olarak
+    kullanır."""
     if not path.exists():
         raise FileNotFoundError(f"Dosya bulunamadı: {path}")
 

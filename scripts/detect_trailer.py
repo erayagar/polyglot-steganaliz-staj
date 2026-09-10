@@ -33,6 +33,8 @@ VIDEO_SIGNATURES = [
 
 
 def find_png_end(data: bytes) -> int:
+    """PNG chunk zincirini `IEND` chunk'ına kadar yürüyüp, chunk'ın (CRC
+    dahil) bittiği bayt offset'ini döndürür — görselin gerçek EOF'u."""
     offset = len(PNG_SIGNATURE)
     n = len(data)
     while offset + 8 <= n:
@@ -48,6 +50,8 @@ def find_png_end(data: bytes) -> int:
 
 
 def find_jpeg_end(data: bytes) -> int:
+    """JPEG marker zincirini `EOI` (FFD9) marker'ına kadar yürüyüp, onun
+    bittiği bayt offset'ini döndürür — görselin gerçek EOF'u."""
     offset = len(JPEG_SOI)
     n = len(data)
     while offset < n:
@@ -79,12 +83,18 @@ def find_jpeg_end(data: bytes) -> int:
 
 
 def find_image_end(data: bytes, image_format: str) -> int:
+    """Format'a göre `find_png_end`/`find_jpeg_end`'e yönlendiren ortak
+    giriş noktası."""
     if image_format == "png":
         return find_png_end(data)
     return find_jpeg_end(data)
 
 
 def scan_video_signature(trailer: bytes):
+    """Trailer baytları içinde `VIDEO_SIGNATURES`'ı arar; en küçük
+    trailer eşiğinin (`MIN_TRAILER_SIZE`) altındaki veriyi (zararsız
+    padding/metadata olabileceğinden) hiç taramaz. Eşleşme bulunursa
+    `{"signature", "trailer_offset"}` döner, aksi halde `None`."""
     if len(trailer) < MIN_TRAILER_SIZE:
         return None
     for name, sig, back_offset in VIDEO_SIGNATURES:
@@ -99,6 +109,9 @@ def scan_video_signature(trailer: bytes):
 
 
 def analyze(path: Path) -> dict:
+    """Dosyanın EOF sonrası trailer'ını tarayıp polyglot durumunu,
+    tespit edilen imzayı ve gizli video offset'ini raporlar. `pipeline.py`
+    ve `extract.py` bu fonksiyonu modülün ana giriş noktası olarak kullanır."""
     data = path.read_bytes()
     file_size = len(data)
 

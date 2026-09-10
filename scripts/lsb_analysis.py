@@ -32,6 +32,7 @@ LSB_DEMO_SEED = 42
 
 
 def load_image_array(path: Path) -> np.ndarray:
+    """Görseli OpenCV BGR dizisi olarak okur; okunamazsa `ValueError`."""
     img = cv2.imread(str(path), cv2.IMREAD_COLOR)
     if img is None:
         raise ValueError(f"Görsel okunamadı (desteklenmeyen format veya bozuk dosya): {path}")
@@ -57,6 +58,9 @@ def embed_lsb_noise_demo(img: np.ndarray, seed: int = LSB_DEMO_SEED) -> np.ndarr
 
 
 def analyze(path: Path, output_path: Path) -> dict:
+    """LSB bit-plane görselleştirmesini `output_path`'e kaydeder ve
+    LSB=1 oranının rastgeleden (0.5) sapmasını raporlar. Modülün ana giriş
+    noktasıdır; tamamlayıcı bir sinyaldir, ana tespit `detect_trailer`'dır."""
     img = load_image_array(path)
     lsb_plane = extract_lsb_plane(img)
     ratio = lsb_one_ratio(img)

@@ -31,6 +31,9 @@ OUTPUT_DIR = SAMPLES_DIR / "test_matrix"
 
 
 def recompress_post_embedding(polyglot_path: Path, output_path: Path, **save_kwargs) -> None:
+    """Zaten video içeren bir polyglot dosyayı PIL ile yeniden kaydeder;
+    PIL yalnızca dekode edilen piksel verisini yazdığından trailer (gizli
+    video) bu işlemde kaybolur (platformun yeniden encode etmesini simüle eder)."""
     with Image.open(polyglot_path) as img:
         img.load()
         img.save(output_path, **save_kwargs)
@@ -38,6 +41,10 @@ def recompress_post_embedding(polyglot_path: Path, output_path: Path, **save_kwa
 
 def recompress_pre_embedding(image_path: Path, video_path: Path, output_path: Path,
                               tmp_carrier: Path, **save_kwargs) -> None:
+    """Taşıyıcı görseli video eklenmeden önce farklı bir sıkıştırma
+    seviyesiyle yeniden kaydedip videoyu bu yeni taşıyıcının arkasına ekler
+    (taşıyıcının iç sıkıştırmasının trailer tespitini etkilemediğini
+    doğrulamak için)."""
     with Image.open(image_path) as img:
         img.save(tmp_carrier, **save_kwargs)
     make_polyglot(tmp_carrier, video_path, output_path)
@@ -45,6 +52,8 @@ def recompress_pre_embedding(image_path: Path, video_path: Path, output_path: Pa
 
 
 def make_clean_gradient(output_path: Path, size=(128, 128)) -> None:
+    """Ek bir temiz (video içermeyen) referans görsel olarak basit bir
+    renk geçişli (gradient) PNG üretir."""
     img = Image.new("RGB", size)
     pixels = img.load()
     for x in range(size[0]):

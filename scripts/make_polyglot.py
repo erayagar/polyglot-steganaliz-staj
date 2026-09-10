@@ -14,6 +14,9 @@ MP4_FTYP = b"ftyp"
 
 
 def detect_image_format(data: bytes) -> str:
+    """Baytların PNG/JPEG imzasıyla başlayıp başlamadığına bakarak formatı
+    belirler; ikisi de değilse `ValueError`. `detect_trailer.py` ve
+    `size_analysis.py` tarafından da kullanılan ortak format tespiti."""
     if data.startswith(PNG_SIGNATURE):
         return "png"
     if data.startswith(JPEG_SOI):
@@ -22,11 +25,16 @@ def detect_image_format(data: bytes) -> str:
 
 
 def validate_mp4(data: bytes) -> None:
+    """Baytların 4-8. konumunda `ftyp` imzası olup olmadığını doğrular;
+    yoksa `ValueError`."""
     if data[4:8] != MP4_FTYP:
         raise ValueError("Video dosyasının 4-8. baytlarında 'ftyp' imzası bulunamadı (MP4 değil)")
 
 
 def make_polyglot(image_path: Path, video_path: Path, output_path: Path) -> None:
+    """Görsel baytlarının arkasına video baytlarını doğrudan ekleyip
+    (basit concatenation) sentetik bir polyglot dosya üretir; özet bilgiyi
+    konsola yazdırır."""
     image_bytes = image_path.read_bytes()
     video_bytes = video_path.read_bytes()
 

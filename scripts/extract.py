@@ -18,6 +18,10 @@ DEFAULT_OUTPUT_DIR = Path("samples/extracted")
 
 
 def extract(path: Path, output_dir: Path, save_image: bool = False) -> dict:
+    """`detect_trailer.analyze` ile bulunan görsel/video sınırından
+    dosyayı ikiye böler, video kısmını bağımsız bir `.mp4` olarak kaydeder.
+    Dosya polyglot değilse `ValueError` fırlatır. `pipeline.py` bu
+    fonksiyonu modülün ana giriş noktası olarak kullanır."""
     trailer_info = analyze_trailer(path)
 
     if not trailer_info["polyglot_status"]:

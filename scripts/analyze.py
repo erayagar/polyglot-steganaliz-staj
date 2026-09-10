@@ -22,6 +22,8 @@ from size_analysis import analyze as size_analyze
 
 
 def entropy_summary(data: bytes, block_size: int, boundary_offset) -> dict:
+    """Blok bazlı entropy değerlerini özetler; `boundary_offset` verilmişse
+    sınır öncesi/sonrası ortalama entropy farkını (`entropy_delta`) hesaplar."""
     blocks = compute_block_entropies(data, block_size)
     entropies = [b["entropy"] for b in blocks]
     result = {
@@ -46,6 +48,10 @@ def entropy_summary(data: bytes, block_size: int, boundary_offset) -> dict:
 
 
 def analyze(path: Path, block_size: int = DEFAULT_BLOCK_SIZE) -> dict:
+    """`detect_trailer`, `size_analysis` ve `entropy` sonuçlarını tek bir
+    sözlükte birleştirir; hiçbir sinyali tek başına kesin karar olarak
+    kullanmadan hepsini yan yana raporlar (ağırlıklı skor Gün 14'te API
+    katmanında hesaplanır, bkz. `backend/app/pipeline.compute_threat_score`)."""
     data = path.read_bytes()
     trailer_result = detect_trailer_analyze(path)
     size_result = size_analyze(path)

@@ -40,6 +40,10 @@ def shannon_entropy(block: bytes) -> float:
 
 
 def compute_block_entropies(data: bytes, block_size: int) -> list[dict]:
+    """Veriyi `block_size` baytlık bloklara bölüp her blok için offset,
+    boyut ve Shannon entropy değerini hesaplar. `pipeline.py` bu
+    fonksiyonu görsel/video sınırındaki entropy sıçramasını ölçmek için
+    kullanır (bkz. `_entropy_summary`)."""
     blocks = []
     for offset in range(0, len(data), block_size):
         block = data[offset:offset + block_size]
@@ -67,6 +71,9 @@ def find_boundary_offset(path: Path):
 
 
 def plot_entropy(blocks: list[dict], block_size: int, boundary_offset, title: str, output_path: Path) -> None:
+    """Blok bazlı entropy değerlerini çizgi grafiği olarak `output_path`'e
+    kaydeder; `boundary_offset` verilmişse görsel/video sınırını kırmızı
+    kesikli çizgiyle işaretler."""
     offsets = [b["offset"] for b in blocks]
     entropies = [b["entropy"] for b in blocks]
 

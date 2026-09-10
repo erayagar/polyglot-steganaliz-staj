@@ -8,7 +8,7 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 
 ## Durum
 
-**Gün 18 / 20 tamamlandı** (Hafta 1-3 ✅ tamamlandı, Hafta 4: web dashboard + test & raporlama 🔶 devam ediyor). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına bakın.
+**Gün 19 / 20 tamamlandı** (Hafta 1-3 ✅ tamamlandı, Hafta 4: web dashboard + test & raporlama ✅ tamamlandı, yalnızca Gün 20 sunum/staj raporu kaldı). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına (indeks: [`docs/README.md`](./docs/README.md)) bakın.
 
 | Bileşen | Durum |
 |---|---|
@@ -16,12 +16,39 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 | Steganaliz motoru (trailer, entropy, boyut sapması, LSB/DCT, extraction) | ✅ Hazır |
 | FastAPI backend (`backend/`, CORS dahil) | ✅ Hazır |
 | Web arayüzü (`frontend/`, backend'e canlı bağlı) | ✅ Hazır, uçtan uca doğrulandı (Gün 18: 12/12 test dosyası, `docs/test-sonuclari.md`) |
+| Dokümantasyon (README, docstring'ler, `docs/` indeksi) | ✅ Hazır (Gün 19) |
 
 ## Nasıl Çalışır
 
 1. **Tespit** — Görselin gerçek dosya sonu (PNG `IEND`, JPEG `EOI`) baytlarından sonra kalan "trailer" veri taranır; içinde bilinen bir video/konteyner imzası (`ftyp`, `moov`, RIFF, EBML/WebM) aranır. Bu, ana tespit sinyalidir.
 2. **Doğrulama** — Trailer sinyali; Shannon entropy'deki görsel/video geçiş sıçraması ve gerçek dosya boyutunun görsel çözünürlüğünden beklenen teorik boyuttan sapmasıyla desteklenir. Üç sinyal ağırlıklı olarak birleştirilip 0-100 arası bir `threat_score`e dönüştürülür.
 3. **Ayıklama (extraction)** — Dosya polyglot ise, trailer'ın başlangıç offset'inden bölünüp gizli video bağımsız bir `.mp4` dosyası olarak kaydedilir ve API üzerinden oynatılabilir hale getirilir.
+
+### Mimari / İstek Akışı
+
+```
+Tarayıcı (frontend/app.js)
+   │  fetch POST, multipart/form-data
+   ▼
+FastAPI /api/v1/analyze (backend/app/main.py)
+   │  magic bytes + boyut doğrulaması, dosya backend/tmp/ altına kaydedilir
+   │  asyncio.to_thread(...)  — CPU-yoğun analiz event loop'u bloklamasın diye ayrı thread'de çalışır
+   ▼
+pipeline.run_pipeline (backend/app/pipeline.py)
+   │  scripts/ modüllerini sırayla çağırır:
+   │  detect_trailer.analyze → size_analysis.analyze → entropy (blok bazlı)
+   │  → (polyglot ise) extract.extract → video_metadata.get_metadata
+   ▼
+pipeline.compute_threat_score + build_analysis_summary
+   │  trailer/entropy/boyut sinyallerini 0-100 threat_score'a ağırlıklı birleştirir
+   ▼
+AnalyzeResponse (JSON) ──► frontend'de risk skoru/özet gösterimi
+   └─ extracted_video_url ──► StaticFiles ("/media") ──► <video> player
+```
+
+`scripts/` altındaki modüller bağımsız CLI araçları olarak da (backend
+olmadan) doğrudan çalıştırılabilir — `backend/` bunları HTTP üzerinden
+sarmalayan ince bir katmandır.
 
 ## Teknoloji Yığını
 - **Backend:** Python 3.11+, FastAPI, Pydantic, Uvicorn
@@ -136,6 +163,7 @@ Her script'in kendi `--help` çıktısı ve `docs/gunN-*.md` raporlarında ayrı
 ## Dokümantasyon
 
 - [`PLAN.md`](./PLAN.md) — 20 günlük plan, kabul kriterleri, ilerleme durumu
+- [`docs/README.md`](./docs/README.md) — `docs/` klasörünün tam indeksi (tüm günlük/haftalık raporlar ve görseller kategorilere ayrılmış halde)
 - [`docs/format-notlari.md`](./docs/format-notlari.md) — PNG/JPEG/MP4 binary format notları
 - [`docs/test-sonuclari.md`](./docs/test-sonuclari.md) — farklı senaryolarda tespit başarımı
 - `docs/gunN-*.md` / `.pdf` — her günün hedefi, yaklaşımı, test sonuçları ve notları

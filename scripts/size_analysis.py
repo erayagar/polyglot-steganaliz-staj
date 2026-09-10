@@ -39,6 +39,7 @@ JPEG_SOF_MARKERS = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 
 
 
 def read_png_dimensions(data: bytes) -> dict:
+    """`IHDR` chunk'ından genişlik/yükseklik/bit derinliği/kanal sayısını okur."""
     if len(data) < 26 or data[12:16] != b"IHDR":
         raise ValueError("PNG IHDR chunk'ı bulunamadı (bozuk dosya)")
     width = int.from_bytes(data[16:20], "big")
@@ -58,12 +59,16 @@ def read_png_dimensions(data: bytes) -> dict:
 
 
 def png_theoretical_raw_size(dims: dict) -> int:
+    """Sıkıştırmasız ham piksel verisinin (satır başına 1 filtre baytı
+    dahil) kaç bayt tutacağını hesaplar."""
     row_bits = dims["width"] * dims["channels"] * dims["bit_depth"]
     row_bytes = -(-row_bits // 8)  # ceil
     return dims["height"] * (1 + row_bytes)  # +1 satır başı filtre baytı
 
 
 def read_jpeg_dimensions(data: bytes) -> dict:
+    """JPEG marker zincirinde SOF segmentini bulup genişlik/yükseklik/kanal
+    sayısını okur."""
     offset = 2  # SOI (FFD8) sonrası
     n = len(data)
     while offset + 1 < n:
@@ -94,6 +99,9 @@ def read_jpeg_dimensions(data: bytes) -> dict:
 
 
 def compute_theoretical_size(data: bytes, image_format: str) -> dict:
+    """Format'a uygun boyut/kanal bilgisini okuyup, sabit sıkıştırma oranı
+    varsayımıyla (bkz. modül docstring'i) beklenen teorik dosya boyutunu
+    hesaplar."""
     if image_format == "png":
         dims = read_png_dimensions(data)
         raw_size = png_theoretical_raw_size(dims)
@@ -114,6 +122,9 @@ def compute_theoretical_size(data: bytes, image_format: str) -> dict:
 
 
 def analyze(path: Path) -> dict:
+    """Gerçek dosya boyutunu teorik boyutla karşılaştırıp sapma yüzdesini
+    ve şüpheli olup olmadığını raporlar. `pipeline.py` bu fonksiyonu
+    modülün ana giriş noktası olarak kullanır."""
     data = path.read_bytes()
     file_size = len(data)
 

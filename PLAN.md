@@ -296,10 +296,10 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 19 — Dokümantasyon ve GitHub Deposu Düzenleme
 **Hedef:** Projenin paylaşılabilir/sunulabilir hale getirilmesi.
 **Alt Görevler:**
-- [ ] `README.md` dosyasının kurulum, kullanım ve mimari açıklamalarıyla genişletilmesi
-- [ ] Kod içi docstring'lerin gözden geçirilmesi (yalnızca gerekli olan yerlerde)
-- [ ] `docs/` klasörünün (format notları, test sonuçları) düzenlenmesi
-- [ ] (Opsiyonel) Git deposunun oluşturulup ilk commit'in atılması
+- [x] `README.md` dosyasının kurulum, kullanım ve mimari açıklamalarıyla genişletilmesi
+- [x] Kod içi docstring'lerin gözden geçirilmesi (yalnızca gerekli olan yerlerde)
+- [x] `docs/` klasörünün (format notları, test sonuçları) düzenlenmesi
+- [x] (Opsiyonel) Git deposunun oluşturulup ilk commit'in atılması
 **Kabul Kriterleri:**
 - `README.md` takip edilerek proje sıfırdan kurulup çalıştırılabiliyor
 **Notlar/Riskler:**

@@ -39,6 +39,7 @@ UNIFORM_RELATIVE_STD_THRESHOLD = 0.5  # std/ortalama bu değerin altındaysa "te
 
 
 def load_grayscale(path: Path) -> np.ndarray:
+    """Görseli gri tonlamalı OpenCV dizisi olarak okur; okunamazsa `ValueError`."""
     img = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
     if img is None:
         raise ValueError(f"Görsel okunamadı (desteklenmeyen format veya bozuk dosya): {path}")
@@ -69,6 +70,8 @@ def compute_block_high_freq_energy(gray: np.ndarray, block_size: int) -> np.ndar
 
 
 def plot_energy_map(energy_map: np.ndarray, title: str, output_path: Path) -> None:
+    """Blok bazlı yüksek frekans enerji haritasını ısı haritası olarak
+    `output_path`'e kaydeder."""
     fig, ax = plt.subplots(figsize=(8, 6))
     im = ax.imshow(energy_map, cmap="inferno", interpolation="nearest")
     ax.set_xlabel("Blok sütunu")
@@ -82,6 +85,10 @@ def plot_energy_map(energy_map: np.ndarray, title: str, output_path: Path) -> No
 
 
 def analyze(path: Path, block_size: int, output_path: Path) -> dict:
+    """DCT yüksek frekans enerji haritasını üretip kaydeder, ortalama/std
+    değerlerine göre tekdüze (gürültü benzeri) mi yoksa içerik-bağımlı mı
+    olduğunu yorumlayarak raporlar. Modülün ana giriş noktasıdır;
+    tamamlayıcı bir sinyaldir, ana tespit `detect_trailer`'dır."""
     gray = load_grayscale(path)
     energy_map = compute_block_high_freq_energy(gray, block_size)
 
