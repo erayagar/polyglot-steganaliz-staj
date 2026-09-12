@@ -13,8 +13,9 @@ için taşımak linkleri kırar).
 - [`test-sonuclari.md`](./test-sonuclari.md) — farklı senaryolarda
   (PNG/JPEG polyglot, yeniden sıkıştırma, temiz dosya, uçtan uca web
   testleri) tespit başarımı tablosu (Gün 10 + Gün 18).
-- [`staj-raporu.md`](./staj-raporu.md) — 20 günlük stajın final raporu:
-  özet, yöntem, karşılaşılan zorluklar, sonuçlar (Gün 20).
+- [`staj-raporu.md`](./staj-raporu.md) / [.pdf](./staj-raporu.pdf) — 20
+  günlük stajın final raporu: özet, yöntem, karşılaşılan zorluklar,
+  sonuçlar (Gün 20).
 
 ## Günlük Raporlar (`gunN-*`)
 Her gün için Hedef/Yaklaşım/Test Sonuçları/Kabul Kriterleri-Durum/Notlar

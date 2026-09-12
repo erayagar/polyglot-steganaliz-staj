@@ -2,7 +2,9 @@
 
 **Proje:** X (Twitter) Platformunda Görsel Arkasına Saklanmış Video ve Veri
 Tespiti (Polyglot / Steganaliz Servisi)
+
 **Süre:** 20 iş günü (4 hafta), Ağustos-Eylül 2026
+
 **Kapsam:** Bu proje yalnızca eğitim ve savunma (defensive security)
 amaçlıdır. Gerçek kullanıcı verisi toplanmadı veya kazınmadı (scraping
 yok); tüm test dosyaları proje kapsamında sentetik olarak üretildi.
@@ -20,6 +22,7 @@ tespiti) ve full-stack web geliştirmeyi (FastAPI backend + vanilla JS
 frontend) tek bir çalışmada birleştirdi.
 
 20 günlük plan, 4 haftalık aşamada tamamlandı:
+
 - **Hafta 1 (Gün 1-5):** Dosya format mimarisi (PNG/JPEG/MP4 binary
   yapısı), sentetik polyglot üretici, EOF-ötesi trailer tespiti, Shannon
   entropy analizi.
@@ -161,9 +164,11 @@ eşleşti, hiçbir hata veya eksik bulunmadı. Ayrıntı için:
 [`docs/gun20-demo-ve-kapanis-raporu.md`](./gun20-demo-ve-kapanis-raporu.md).
 
 ### 4.4 Kapsam Dışı Bırakılan / Gelecek Geliştirmeler
+
 Aşağıdakiler bilinçli olarak 20 günlük planın kapsamı dışında tutuldu;
 proje tamamlandıktan sonra istenirse ayrı ayrı ele alınabilir (ayrıntı:
 [`PLAN.md`](../PLAN.md#günlerin-ardından-geliştirmeler-opsiyonel)):
+
 - Otomatik `pytest` test paketi (şu ana kadar tüm testler manuel/Gün 10
   ve Gün 18'de dokümante edilmiş şekilde yapıldı)
 - README'ye ekran görüntüsü/GIF, görsel mimari diyagramı
