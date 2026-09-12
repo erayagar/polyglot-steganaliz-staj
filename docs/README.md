@@ -42,7 +42,7 @@ sunulabilir kopyasıdır (Gün 1 ve Gün 2 yalnızca `.pdf` olarak mevcut).
 | 17 | Frontend-backend entegrasyonu | [gun17-frontend-backend-entegrasyonu-raporu.md](./gun17-frontend-backend-entegrasyonu-raporu.md) |
 | 18 | Uçtan uca doğrulama testleri | [gun18-uctan-uca-dogrulama-raporu.md](./gun18-uctan-uca-dogrulama-raporu.md) |
 | 19 | Dokümantasyon ve depo düzenleme | [gun19-dokumantasyon-repo-raporu.md](./gun19-dokumantasyon-repo-raporu.md) / [.pdf](./gun19-dokumantasyon-repo-raporu.pdf) |
-| 20 | Sunum, demo provası ve staj raporu teslimi | [gun20-demo-ve-kapanis-raporu.md](./gun20-demo-ve-kapanis-raporu.md) |
+| 20 | Sunum, demo provası ve staj raporu teslimi | [gun20-demo-ve-kapanis-raporu.md](./gun20-demo-ve-kapanis-raporu.md) / [.pdf](./gun20-demo-ve-kapanis-raporu.pdf) |
 
 ## Haftalık Özet Raporlar
 - [`hafta1-raporu.md`](./hafta1-raporu.md) — Hafta 1 (Gün 1-5): dosya
@@ -51,6 +51,8 @@ sunulabilir kopyasıdır (Gün 1 ve Gün 2 yalnızca `.pdf` olarak mevcut).
   steganaliz motoru, extraction, video meta verisi, senaryo testleri.
 - [`hafta3-raporu.md`](./hafta3-raporu.md) — Hafta 3 (Gün 11-15): FastAPI
   REST servisi, pipeline entegrasyonu, `threat_score` şeması, hata yönetimi.
+- [`hafta4-raporu.md`](./hafta4-raporu.md) — Hafta 4 (Gün 16-20): web
+  dashboard, uçtan uca doğrulama, dokümantasyon, staj final raporu.
 
 ## Üretilmiş Analiz Görselleri
 Günlük raporların içinden göreli dosya adıyla (`![...](dosya.png)`)
