@@ -8,7 +8,7 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 
 ## Durum
 
-**Gün 19 / 20 tamamlandı** (Hafta 1-3 ✅ tamamlandı, Hafta 4: web dashboard + test & raporlama ✅ tamamlandı, yalnızca Gün 20 sunum/staj raporu kaldı). Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına (indeks: [`docs/README.md`](./docs/README.md)) bakın.
+**Gün 20 / 20 tamamlandı — proje bitti.** Detaylı ilerleme ve kabul kriterleri için [PLAN.md](./PLAN.md); her günün "neden bu şekilde yapıldığı" açıklamaları için `docs/gunN-*.md` raporlarına (indeks: [`docs/README.md`](./docs/README.md)) bakın; genel özet için [`docs/staj-raporu.md`](./docs/staj-raporu.md).
 
 | Bileşen | Durum |
 |---|---|
@@ -166,6 +166,7 @@ Her script'in kendi `--help` çıktısı ve `docs/gunN-*.md` raporlarında ayrı
 - [`docs/README.md`](./docs/README.md) — `docs/` klasörünün tam indeksi (tüm günlük/haftalık raporlar ve görseller kategorilere ayrılmış halde)
 - [`docs/format-notlari.md`](./docs/format-notlari.md) — PNG/JPEG/MP4 binary format notları
 - [`docs/test-sonuclari.md`](./docs/test-sonuclari.md) — farklı senaryolarda tespit başarımı
+- [`docs/staj-raporu.md`](./docs/staj-raporu.md) — staj final raporu (özet, yöntem, karşılaşılan zorluklar, sonuçlar)
 - `docs/gunN-*.md` / `.pdf` — her günün hedefi, yaklaşımı, test sonuçları ve notları
 
 ## Günlerin Ardından Geliştirmeler (Opsiyonel)

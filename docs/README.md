@@ -13,6 +13,8 @@ için taşımak linkleri kırar).
 - [`test-sonuclari.md`](./test-sonuclari.md) — farklı senaryolarda
   (PNG/JPEG polyglot, yeniden sıkıştırma, temiz dosya, uçtan uca web
   testleri) tespit başarımı tablosu (Gün 10 + Gün 18).
+- [`staj-raporu.md`](./staj-raporu.md) — 20 günlük stajın final raporu:
+  özet, yöntem, karşılaşılan zorluklar, sonuçlar (Gün 20).
 
 ## Günlük Raporlar (`gunN-*`)
 Her gün için Hedef/Yaklaşım/Test Sonuçları/Kabul Kriterleri-Durum/Notlar
@@ -40,6 +42,7 @@ sunulabilir kopyasıdır (Gün 1 ve Gün 2 yalnızca `.pdf` olarak mevcut).
 | 17 | Frontend-backend entegrasyonu | [gun17-frontend-backend-entegrasyonu-raporu.md](./gun17-frontend-backend-entegrasyonu-raporu.md) |
 | 18 | Uçtan uca doğrulama testleri | [gun18-uctan-uca-dogrulama-raporu.md](./gun18-uctan-uca-dogrulama-raporu.md) |
 | 19 | Dokümantasyon ve depo düzenleme | [gun19-dokumantasyon-repo-raporu.md](./gun19-dokumantasyon-repo-raporu.md) / [.pdf](./gun19-dokumantasyon-repo-raporu.pdf) |
+| 20 | Sunum, demo provası ve staj raporu teslimi | [gun20-demo-ve-kapanis-raporu.md](./gun20-demo-ve-kapanis-raporu.md) |
 
 ## Haftalık Özet Raporlar
 - [`hafta1-raporu.md`](./hafta1-raporu.md) — Hafta 1 (Gün 1-5): dosya

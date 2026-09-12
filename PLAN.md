@@ -310,9 +310,9 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 ### Gün 20 — Sunum ve Staj Raporu Teslimi
 **Hedef:** Proje sonuçlarının akademik danışmana sunulması.
 **Alt Görevler:**
-- [ ] Kısa bir demo akışının hazırlanması (temiz dosya → polyglot dosya → analiz → ayıklama → oynatma)
-- [ ] Staj raporu taslağının (`docs/staj-raporu.md`) tamamlanması: özet, yöntem, karşılaşılan zorluklar, sonuçlar
-- [ ] Canlı sistem demosunun prova edilmesi
+- [x] Kısa bir demo akışının hazırlanması (temiz dosya → polyglot dosya → analiz → ayıklama → oynatma)
+- [x] Staj raporu taslağının (`docs/staj-raporu.md`) tamamlanması: özet, yöntem, karşılaşılan zorluklar, sonuçlar
+- [x] Canlı sistem demosunun prova edilmesi
 **Kabul Kriterleri:**
 - Demo akışı baştan sona hatasız çalışıyor
 - Staj raporu taslağı tüm bölümleriyle tamamlanmış
