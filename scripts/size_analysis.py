@@ -23,7 +23,7 @@ import json
 import sys
 from pathlib import Path
 
-from detect_trailer import NO_LENGTH_MARKERS
+from detect_trailer import NO_LENGTH_MARKERS, read_jpeg_marker, read_jpeg_segment_length
 from make_polyglot import detect_image_format
 
 # Sıkıştırılmamış ham boyuta göre beklenen ortalama sıkıştırma oranları.
@@ -35,6 +35,8 @@ JPEG_EXPECTED_COMPRESSION_RATIO = 0.10  # ~10:1 — tipik varsayılan kalite var
 DEVIATION_THRESHOLD_PERCENT = 20.0
 
 PNG_COLOR_TYPE_CHANNELS = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}
+PNG_VALID_BIT_DEPTHS = {1, 2, 4, 8, 16}
+JPEG_VALID_CHANNELS = {1, 2, 3, 4}
 JPEG_SOF_MARKERS = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
 
 
@@ -48,6 +50,8 @@ def read_png_dimensions(data: bytes) -> dict:
     color_type = data[25]
     if color_type not in PNG_COLOR_TYPE_CHANNELS:
         raise ValueError(f"Bilinmeyen PNG renk tipi: {color_type}")
+    if bit_depth not in PNG_VALID_BIT_DEPTHS:
+        raise ValueError(f"Geçersiz PNG bit derinliği: {bit_depth} (bozuk dosya)")
     if width == 0 or height == 0:
         raise ValueError("PNG genişlik/yükseklik 0 olamaz (bozuk dosya)")
     return {
@@ -71,20 +75,19 @@ def read_jpeg_dimensions(data: bytes) -> dict:
     sayısını okur."""
     offset = 2  # SOI (FFD8) sonrası
     n = len(data)
-    while offset + 1 < n:
-        if data[offset] != 0xFF:
-            raise ValueError(f"JPEG marker beklenirken 0x{data[offset]:02X} bulundu (offset {offset})")
-        marker = data[offset + 1]
-        offset += 2
+    while offset < n:
+        marker, offset = read_jpeg_marker(data, offset)
 
         if marker in JPEG_SOF_MARKERS:
-            if offset + 7 > n:
+            if offset + 8 > n:
                 raise ValueError("JPEG SOF segmenti eksik (bozuk dosya)")
             height = int.from_bytes(data[offset + 3:offset + 5], "big")
             width = int.from_bytes(data[offset + 5:offset + 7], "big")
             channels = data[offset + 7]
             if width == 0 or height == 0:
                 raise ValueError("JPEG genişlik/yükseklik 0 olamaz (bozuk dosya)")
+            if channels not in JPEG_VALID_CHANNELS:
+                raise ValueError(f"Geçersiz JPEG kanal sayısı: {channels} (bozuk dosya)")
             return {"width": width, "height": height, "channels": channels}
 
         if marker == 0xD9:  # EOI — SOF'a rastlanmadan dosya bitti
@@ -92,8 +95,7 @@ def read_jpeg_dimensions(data: bytes) -> dict:
         if marker in NO_LENGTH_MARKERS:
             continue
 
-        length = int.from_bytes(data[offset:offset + 2], "big")
-        offset += length
+        offset += read_jpeg_segment_length(data, offset)
 
     raise ValueError("JPEG SOF marker'ı bulunamadı (boyut bilgisi okunamadı)")
 
@@ -121,16 +123,16 @@ def compute_theoretical_size(data: bytes, image_format: str) -> dict:
     }
 
 
-def analyze(path: Path) -> dict:
-    """Gerçek dosya boyutunu teorik boyutla karşılaştırıp sapma yüzdesini
-    ve şüpheli olup olmadığını raporlar. `pipeline.py` bu fonksiyonu
-    modülün ana giriş noktası olarak kullanır."""
-    data = path.read_bytes()
+def analyze_bytes(data: bytes, label: str) -> dict:
+    """`analyze` ile aynı sonucu, dosyayı yeniden okumadan bellekteki
+    baytlar üzerinde üretir (`pipeline.py` dosyayı yalnızca bir kez okur)."""
     file_size = len(data)
 
     image_format = detect_image_format(data)
     info = compute_theoretical_size(data, image_format)
     theoretical_size = info["theoretical_size"]
+    if theoretical_size <= 0:
+        raise ValueError("Teorik boyut hesaplanamadı (geçersiz görsel başlığı)")
 
     deviation_percent = (file_size - theoretical_size) / theoretical_size * 100
     suspicious = deviation_percent > DEVIATION_THRESHOLD_PERCENT
@@ -148,7 +150,7 @@ def analyze(path: Path) -> dict:
         )
 
     return {
-        "file": str(path),
+        "file": label,
         "file_size": file_size,
         "image_format": image_format,
         "width": info["width"],
@@ -162,6 +164,12 @@ def analyze(path: Path) -> dict:
         "suspicious": suspicious,
         "analysis_summary": summary,
     }
+
+
+def analyze(path: Path) -> dict:
+    """Gerçek dosya boyutunu teorik boyutla karşılaştırıp sapma yüzdesini
+    ve şüpheli olup olmadığını raporlar. Modülün CLI giriş noktasıdır."""
+    return analyze_bytes(path.read_bytes(), str(path))
 
 
 def parse_args() -> argparse.Namespace:

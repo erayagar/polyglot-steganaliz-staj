@@ -16,14 +16,27 @@ import statistics
 import sys
 from pathlib import Path
 
-from detect_trailer import analyze as detect_trailer_analyze
+from detect_trailer import analyze_bytes as detect_trailer_analyze_bytes
 from entropy import DEFAULT_BLOCK_SIZE, compute_block_entropies
-from size_analysis import analyze as size_analyze
+from size_analysis import analyze_bytes as size_analyze_bytes
+
+
+def entropy_boundary(trailer_result: dict):
+    """Entropy karşılaştırmasının yapılacağı sınır: gizli video bulunduysa
+    onun başlangıcı, yoksa EOF sonrası veri varsa görselin gerçek sonu
+    (böylece video olmayan gizli veri de ölçülür), hiçbiri yoksa `None`."""
+    if trailer_result["hidden_video_offset"] is not None:
+        return trailer_result["hidden_video_offset"]
+    if trailer_result["trailer_size"] > 0:
+        return trailer_result["image_end_offset"]
+    return None
 
 
 def entropy_summary(data: bytes, block_size: int, boundary_offset) -> dict:
     """Blok bazlı entropy değerlerini özetler; `boundary_offset` verilmişse
-    sınır öncesi/sonrası ortalama entropy farkını (`entropy_delta`) hesaplar."""
+    sınır öncesi/sonrası ortalama entropy farkını (`entropy_delta`) hesaplar.
+    Sınırın iki tarafı ayrı ayrı bloklanır; böylece sınırı aşan tek bir
+    blok iki bölgenin verisini karıştırmaz."""
     blocks = compute_block_entropies(data, block_size)
     entropies = [b["entropy"] for b in blocks]
     result = {
@@ -36,8 +49,8 @@ def entropy_summary(data: bytes, block_size: int, boundary_offset) -> dict:
         "entropy_delta": None,
     }
     if boundary_offset is not None:
-        before = [b["entropy"] for b in blocks if b["offset"] < boundary_offset]
-        after = [b["entropy"] for b in blocks if b["offset"] >= boundary_offset]
+        before = [b["entropy"] for b in compute_block_entropies(data[:boundary_offset], block_size)]
+        after = [b["entropy"] for b in compute_block_entropies(data[boundary_offset:], block_size)]
         if before and after:
             mean_before = statistics.fmean(before)
             mean_after = statistics.fmean(after)
@@ -53,9 +66,9 @@ def analyze(path: Path, block_size: int = DEFAULT_BLOCK_SIZE) -> dict:
     kullanmadan hepsini yan yana raporlar (ağırlıklı skor Gün 14'te API
     katmanında hesaplanır, bkz. `backend/app/pipeline.compute_threat_score`)."""
     data = path.read_bytes()
-    trailer_result = detect_trailer_analyze(path)
-    size_result = size_analyze(path)
-    ent_result = entropy_summary(data, block_size, trailer_result["hidden_video_offset"])
+    trailer_result = detect_trailer_analyze_bytes(data, str(path))
+    size_result = size_analyze_bytes(data, str(path))
+    ent_result = entropy_summary(data, block_size, entropy_boundary(trailer_result))
 
     return {
         "file": str(path),
@@ -91,7 +104,7 @@ def print_report(result: dict) -> None:
               f"öncesi={ent['mean_entropy_before_boundary']} sonrası={ent['mean_entropy_after_boundary']} "
               f"(delta={ent['entropy_delta']})")
     else:
-        print(f"[entropy] ortalama entropy: {ent['mean_entropy']} (görsel/video sınırı tespit edilemedi)")
+        print(f"[entropy] ortalama entropy: {ent['mean_entropy']} (EOF sonrası veri yok, sınır karşılaştırması yapılmadı)")
 
 
 def main() -> int:

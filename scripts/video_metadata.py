@@ -20,6 +20,15 @@ from pathlib import Path
 from typing import Optional
 
 
+def _parse_float(raw) -> Optional[float]:
+    """ffprobe'un sayısal alanlarını okur; alan yoksa veya "N/A" gibi
+    sayı olmayan bir değer içeriyorsa `None` döner."""
+    try:
+        return float(raw) if raw is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
 def _probe_ffprobe(path: Path) -> Optional[dict]:
     ffprobe_bin = shutil.which("ffprobe")
     if ffprobe_bin is None:
@@ -54,8 +63,9 @@ def _probe_ffprobe(path: Path) -> Optional[dict]:
 
     fmt = data.get("format", {})
 
-    duration_raw = video_stream.get("duration") or fmt.get("duration")
-    duration = float(duration_raw) if duration_raw is not None else None
+    duration = _parse_float(video_stream.get("duration"))
+    if duration is None:
+        duration = _parse_float(fmt.get("duration"))
 
     nb_frames_raw = video_stream.get("nb_frames")
     frame_count = int(nb_frames_raw) if nb_frames_raw and nb_frames_raw.isdigit() else None
@@ -63,10 +73,9 @@ def _probe_ffprobe(path: Path) -> Optional[dict]:
     fps = None
     r_frame_rate = video_stream.get("r_frame_rate")
     if r_frame_rate and "/" in r_frame_rate:
-        num, den = r_frame_rate.split("/")
-        den = float(den)
-        if den:
-            fps = round(float(num) / den, 3)
+        num, den = (_parse_float(x) for x in r_frame_rate.split("/", 1))
+        if num is not None and den:
+            fps = round(num / den, 3)
 
     if frame_count is None and fps and duration:
         frame_count = round(fps * duration)
