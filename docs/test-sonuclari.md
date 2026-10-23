@@ -230,3 +230,65 @@ loglarında 12+2 istek boyunca hiçbir `500` görülmedi.
 - [x] Sonuçlar yukarıdaki tabloya işlendi
 - [x] Bulunan hata/eksik yok (test edildi, kayıtlı)
 - [x] Tüm test senaryoları beklenen `polyglot_status` sonucunu verdi (12/12)
+
+---
+
+## Kod İncelemesi Sonrası Yeniden Ölçüm (2026-10-23)
+
+Proje bitiminden sonra yapılan kod incelemesinde bulunan hatalar
+düzeltildi ve otomatik bir test paketi (`tests/`, `pytest`, 40 test) eklendi.
+Önceki bölümlerdeki tablolar o günlerin kaydı olarak değiştirilmeden
+bırakıldı. Aşağıdaki tablo, düzeltmelerden sonra aynı 12 dosyanın sonucudur.
+
+### Skoru etkileyen değişiklikler
+- **Boyut sapması** artık yalnızca EOF sonrası veri varken skora katkı
+  veriyor. Sabit sıkıştırma oranı varsayımı temiz görsellerde de yüksek
+  sapma üretebiliyordu (`lsb_stego_sample.png`: +%45.6 → eskiden skor 7).
+- **Entropy farkı** sınırın iki tarafı ayrı ayrı bloklanarak hesaplanıyor.
+  Sınırı aşan blok artık "önce" grubuna karışmıyor. Video imzası yokken de
+  EOF sonrası veri varsa görselin gerçek sonu sınır olarak kullanılıyor.
+- **İmzası tanınmayan EOF sonrası veri** (≥16 bayt, ör. arkaya eklenmiş ZIP)
+  artık "zararsız" sayılmıyor ve `TRAILER_UNKNOWN_WEIGHT` (35) kadar skor
+  alıyor. ZIP/RAR/7z/PDF imzaları `other_signature` alanında raporlanıyor.
+- **Video imzaları yapısal olarak doğrulanıyor.** ISO-BMFF için box zinciri,
+  RIFF için `AVI ` formu, EBML için `webm`/`matroska` DocType kontrol
+  ediliyor. Düz metinde geçen "moov"/"RIFF" kelimeleri artık polyglot
+  sayılmıyor.
+
+| # | Dosya | Gerçek durum | `polyglot_status` | `threat_score` (eski → yeni) |
+|---|---|---|---|---|
+| 1 | `sample.png` | temiz | false | 0 → 0 |
+| 2 | `sample.jpg` | temiz | false | 2 → 0 |
+| 3 | `lsb_stego_sample.png` | LSB stego (trailer yok) | false | 7 → 0 |
+| 4 | `test_matrix/clean_gradient.png` | temiz | false | 0 → 0 |
+| 5 | `test_matrix/recompressed_post_png.png` | temiz | false | 0 → 0 |
+| 6 | `test_matrix/recompressed_post_jpg.jpg` | temiz | false | 0 → 0 |
+| 7 | `polyglot_png.png` | polyglot | **true** | 76 → 75 |
+| 8 | `polyglot_jpg.jpg` | polyglot | **true** | 85 → 84 |
+| 9 | `test_matrix/recompressed_pre_png.png` | polyglot | **true** | 75 → 71 |
+| 10 | `test_matrix/recompressed_pre_jpg.jpg` | polyglot | **true** | 86 → 84 |
+| 11 | `test_matrix/polyglot_checker_png.png` | polyglot | **true** | 66 → 61 |
+| 12 | `test_matrix/polyglot_solid_jpg.jpg` | polyglot | **true** | 69 → 70 |
+
+### Etiket düzeltmesi
+`lsb_stego_sample.png` önceki tablolarda "temiz" olarak etiketlenmişti.
+Dosyada aslında LSB steganografi ile gömülmüş veri var; "temiz" etiketi
+yalnızca **trailer-append (polyglot) tehdit modeli** açısından doğrudur.
+LSB/DCT analizleri (`scripts/lsb_analysis.py`, `scripts/dct_analysis.py`)
+API pipeline'ına bağlı değildir. Bunlar yalnızca CLI'dan çalıştırılan
+deneysel ve tamamlayıcı araçlardır, bu yüzden bu dosya arayüzde "Temiz
+dosya" olarak görünür. `lsb_one_ratio ≈ 0.5` metriği doğal görsellerde de
+çıktığı için tek başına ayırt edici değildir.
+
+### Kısıtlar
+Trailer tespitindeki %100 başarı, **küçük (64×64 – 128×128), tamamen sentetik**
+ve basit concatenation ile üretilmiş dosyalar için geçerlidir. Aşağıdaki
+senaryolar bu ölçümde **denenmedi**:
+- Verinin görselin içine gömülmesi (PNG ancillary chunk, JPEG APPn/COM segmenti).
+  Trailer taraması bunları yapısı gereği göremez.
+- Gerçek fotoğraf boyutlarında (MB'larca) görseller ve büyük trailer'lar.
+- Gerçek encoder'larla üretilmiş AVI/WebM videolar. Bunlar yalnızca birim
+  testlerde sentetik başlıklarla doğrulandı.
+
+Görsel ile video arasına konan ara veri (padding) birim testlerle kapsanıyor.
+Ayıklama artık `hidden_video_offset`'ten yapılıyor ve ara veri atlanıyor.

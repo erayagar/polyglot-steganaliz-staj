@@ -57,6 +57,7 @@ Her günün alt görevleri tamamlandıkça `- [ ]` kutucuklarını `- [x]` olara
 - [x] `scripts/make_polyglot.py` dosyasının oluşturulması: `image_path`, `video_path`, `output_path` parametreleri alan CLI script
 - [x] Görsel dosyasının ham baytlarının okunup, MP4 dosyasının baytlarının doğrudan arkasına eklenmesi (basit concatenation)
 - [x] Üretilen dosyanın `samples/` altına örnek olarak kaydedilmesi (`.gitignore` ile git'e dahil edilmeyecek)
+  - *Sonradan güncellendi:* küçük sentetik örnekler `tests/` tarafından kullanıldığı için kasıtlı olarak repoda tutuluyor; yalnızca türetilen `samples/extracted/` ve `samples/test_matrix/` git dışı.
 - [x] Script'in hem PNG+MP4 hem JPEG+MP4 kombinasyonlarını desteklemesi
 **Kabul Kriterleri:**
 - Üretilen polyglot dosya bir görsel görüntüleyicide (Preview, tarayıcı vb.) sorunsuz açılıyor
@@ -336,7 +337,7 @@ fazla genişletmeden eklenebilecek, kalite/sunum değeri yüksek ek
 geliştirme fikirleri burada not edilmiştir. Hiçbiri zorunlu değildir —
 istenirse ileride tek tek ele alınabilir.
 
-- [ ] **Otomatik test paketi (`pytest`)** — şu ana kadar tüm testler
+- [x] **Otomatik test paketi (`pytest`)** — 2026-10-23 kod incelemesiyle eklendi (`tests/`, 40 test; ayrıntı: `docs/test-sonuclari.md` son bölüm). Önceden tüm testler
   manuel (Gün 10, Gün 18); `detect_trailer.analyze`, `size_analysis.analyze`,
   `extract.extract`, `pipeline.compute_threat_score` gibi saf fonksiyonlar
   ve FastAPI `TestClient` ile endpoint doğrulamaları (`/api/v1/analyze`

@@ -13,7 +13,9 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 | Bileşen | Durum |
 |---|---|
 | Format analizi ve polyglot üretici (`scripts/`) | ✅ Hazır |
-| Steganaliz motoru (trailer, entropy, boyut sapması, LSB/DCT, extraction) | ✅ Hazır |
+| Steganaliz motoru (trailer, entropy, boyut sapması, extraction) | ✅ Hazır |
+| LSB/DCT analizi (`scripts/lsb_analysis.py`, `scripts/dct_analysis.py`) | 🧪 Yalnızca CLI, deneysel/tamamlayıcı — API skoruna dahil değil |
+| Otomatik testler (`tests/`, `pytest`) | ✅ 40 test |
 | FastAPI backend (`backend/`, CORS dahil) | ✅ Hazır |
 | Web arayüzü (`frontend/`, backend'e canlı bağlı) | ✅ Hazır, uçtan uca doğrulandı (Gün 18: 12/12 test dosyası, `docs/test-sonuclari.md`) |
 | Dokümantasyon (README, docstring'ler, `docs/` indeksi) | ✅ Hazır (Gün 19) |
@@ -22,7 +24,7 @@ Bu proje bir **20 günlük staj programı** kapsamında geliştirilmektedir. Gü
 
 1. **Tespit** — Görselin gerçek dosya sonu (PNG `IEND`, JPEG `EOI`) baytlarından sonra kalan "trailer" veri taranır; içinde bilinen bir video/konteyner imzası (`ftyp`, `moov`, RIFF, EBML/WebM) aranır. Bu, ana tespit sinyalidir.
 2. **Doğrulama** — Trailer sinyali; Shannon entropy'deki görsel/video geçiş sıçraması ve gerçek dosya boyutunun görsel çözünürlüğünden beklenen teorik boyuttan sapmasıyla desteklenir. Üç sinyal ağırlıklı olarak birleştirilip 0-100 arası bir `threat_score`e dönüştürülür.
-3. **Ayıklama (extraction)** — Dosya polyglot ise, trailer'ın başlangıç offset'inden bölünüp gizli video bağımsız bir `.mp4` dosyası olarak kaydedilir ve API üzerinden oynatılabilir hale getirilir.
+3. **Ayıklama (extraction)** — Dosya polyglot ise, tespit edilen video konteynerinin başlangıç offset'inden bölünür (görselle video arasındaki ara veri atlanır) ve gizli video imzasına uygun uzantıyla (`.mp4`/`.avi`/`.webm`) bağımsız bir dosya olarak kaydedilip API üzerinden oynatılabilir hale getirilir.
 
 ### Mimari / İstek Akışı
 
@@ -54,7 +56,7 @@ sarmalayan ince bir katmandır.
 - **Backend:** Python 3.11+, FastAPI, Pydantic, Uvicorn
 - **Görüntü/Video İşleme:** OpenCV, Pillow, NumPy, ffmpeg/ffprobe
 - **Frontend:** HTML5 / CSS3 / Vanilla JS (sürükle-bırak yükleme, backend'e canlı `fetch` entegrasyonu)
-- **Analiz:** Shannon entropy, LSB/DCT gürültü analizi, dosya trailer (EOF ötesi) taraması, teorik/gerçek boyut sapma analizi
+- **Analiz:** dosya trailer (EOF ötesi) taraması ve konteyner yapısı doğrulaması, Shannon entropy, teorik/gerçek boyut sapma analizi; CLI'da deneysel LSB/DCT gürültü analizi
 
 ## Proje Yapısı
 ```
@@ -68,7 +70,9 @@ polyglot-steganaliz-staj/
 │   └── requirements.txt
 ├── frontend/             # Web dashboard (sürükle-bırak yükleme, sonuç/video gösterimi)
 ├── scripts/              # Bağımsız çalıştırılabilir CLI analiz/üretim script'leri
-├── samples/              # Sentetik test dosyaları (git'e dahil değil)
+├── samples/              # Küçük sentetik örnek dosyalar (testler kullanır; türetilen
+│                         # samples/extracted/ ve samples/test_matrix/ git'e dahil değil)
+├── tests/                # pytest test paketi (scripts/ + API)
 └── docs/                 # Format notları, test sonuçları, günlük raporlar (.md + .pdf)
 ```
 
@@ -129,15 +133,17 @@ curl -F "file=@samples/polyglot_png.png;type=image/png" \
 ```json
 {
   "polyglot_status": true,
-  "threat_score": 76,
+  "threat_score": 75,
   "extracted_video_url": "/media/81c78d83ac5d4b9289d8bafbf44fdf7f_extracted.mp4",
-  "analysis_summary": "Görsele gizlenmiş video tespit edildi: 'mp4/ftyp' imzası offset 217 konumunda bulundu (threat_score=76). Ayıklanan video: 64x64, 2.0 sn, codec=h264."
+  "analysis_summary": "Görsele gizlenmiş video tespit edildi: 'mp4/ftyp' imzası offset 217 konumunda bulundu (threat_score=75). Ayıklanan video: 64x64, 2.0 sn, codec=h264."
 }
 ```
 
 `extracted_video_url` doluysa, ayıklanan video `http://127.0.0.1:8000<extracted_video_url>` adresinden doğrudan oynatılabilir/indirilebilir.
 
-Yalnızca PNG/JPEG kabul edilir (magic bytes ile doğrulanır) ve dosya boyutu 25 MB ile sınırlıdır; bu kısıtların dışına çıkan istekler anlamlı bir `4xx` hata mesajıyla reddedilir.
+Yalnızca PNG/JPEG kabul edilir. Format dosyanın magic bytes'ından belirlenir: beyan edilen `Content-Type` genel bir tipse (ör. `application/octet-stream`) dosya yine kabul edilir; beyan PNG/JPEG olup içerikle uyuşmuyorsa reddedilir. Dosya boyutu 25 MB ile sınırlıdır ve sınırı aşan istekler gövde okunmadan `413` ile reddedilir. Bozuk dosyalar `422`, diğer kısıt ihlalleri `400` döner. Başarılı analiz `200` döner. Yüklenen dosya analizden sonra silinir; ayıklanan videolar 1 saat sonra `media/`'dan temizlenir.
+
+EOF sonrası video imzası taşımayan ama eşik üstü veri (ör. arkaya eklenmiş ZIP) `polyglot_status=false` olsa da şüpheli sayılır ve orta düzey bir `threat_score` alır.
 
 ### CLI script'leri (analiz motorunun temeli)
 
@@ -160,6 +166,15 @@ python scripts/video_metadata.py --file samples/extracted/polyglot_extracted.mp4
 
 Her script'in kendi `--help` çıktısı ve `docs/gunN-*.md` raporlarında ayrıntılı gerekçesi mevcuttur.
 
+## Testler
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest -q
+```
+
+`tests/` altındaki testler parser hatalarını, imza doğrulamasını, ayıklamayı, skor hesabını ve API hata kodlarını (`TestClient` ile) kapsar.
+
 ## Dokümantasyon
 
 - [`PLAN.md`](./PLAN.md) — 20 günlük plan, kabul kriterleri, ilerleme durumu
@@ -174,8 +189,7 @@ Her script'in kendi `--help` çıktısı ve `docs/gunN-*.md` raporlarında ayrı
 20 günlük planın parçası değildir. Proje işlevsel olarak tamamlandıktan
 sonra, kapsamı genişletmeden eklenebilecek kalite/sunum iyileştirmeleri
 [`PLAN.md`](./PLAN.md#günlerin-ardından-geliştirmeler-opsiyonel) içinde
-ayrı bir başlık altında listelenmiştir (ör. otomatik `pytest` test paketi,
-arayüz ekran görüntüsü, görsel mimari diyagramı). Hiçbiri zorunlu değildir.
+ayrı bir başlık altında listelenmiştir (ör. arayüz ekran görüntüsü, görsel mimari diyagramı). Hiçbiri zorunlu değildir.
 
 ## Lisans / Etik Not
 Bu proje yalnızca eğitim ve savunma amaçlı geliştirilmiştir. Herhangi bir platformdan izinsiz veri kazıma (scraping) veya gerçek kullanıcı verisiyle test yapılmaz; tüm örnek dosyalar sentetik olarak üretilir.
