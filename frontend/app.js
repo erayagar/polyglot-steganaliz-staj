@@ -3,7 +3,9 @@
 
   const ACCEPTED_TYPES = new Set(["image/png", "image/jpeg"]);
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB, backend ile aynı sınır
-  const API_BASE_URL = "http://127.0.0.1:8000";
+  // index.html'deki <meta name="api-base-url"> ile değiştirilebilir.
+  const API_BASE_URL =
+    document.querySelector('meta[name="api-base-url"]')?.content || "http://127.0.0.1:8000";
 
   const THREAT_LOW_MAX = 33; // 0-33: düşük (yeşil)
   const THREAT_MEDIUM_MAX = 66; // 34-66: orta (sarı), 67-100: yüksek (kırmızı)
@@ -89,7 +91,12 @@
 
     const scoreRow = document.createElement("div");
     scoreRow.className = "threat-score";
-    scoreRow.innerHTML = `<span>Tehdit skoru</span><span class="threat-score__value ${levelClass}">${data.threat_score}/100</span>`;
+    const scoreLabel = document.createElement("span");
+    scoreLabel.textContent = "Tehdit skoru";
+    const scoreValue = document.createElement("span");
+    scoreValue.className = `threat-score__value ${levelClass}`;
+    scoreValue.textContent = `${data.threat_score}/100`;
+    scoreRow.append(scoreLabel, scoreValue);
     resultsSection.appendChild(scoreRow);
 
     const bar = document.createElement("div");
@@ -195,9 +202,8 @@
 
     const validationError = validateFile(file);
     if (validationError) {
+      resetSelection();
       showError(validationError);
-      filePreview.hidden = true;
-      selectedFile = null;
       return;
     }
 
@@ -220,7 +226,10 @@
     dropzone.classList.add("dropzone--dragover");
   });
 
-  dropzone.addEventListener("dragleave", () => {
+  dropzone.addEventListener("dragleave", (event) => {
+    // Alt elemanlar arasında gezinirken de dragleave tetiklenir; yalnızca
+    // dropzone'un dışına çıkıldığında vurgu kaldırılır.
+    if (dropzone.contains(event.relatedTarget)) return;
     dropzone.classList.remove("dropzone--dragover");
   });
 
